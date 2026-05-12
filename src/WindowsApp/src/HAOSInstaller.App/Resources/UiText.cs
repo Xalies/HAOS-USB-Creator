@@ -1,0 +1,93 @@
+using System.Globalization;
+using System.Resources;
+
+namespace HAOSInstaller.App.Resources;
+
+public static class UiText
+{
+    private static readonly ResourceManager ResourceManager = new("HAOSInstaller.App.Resources.UiStrings", typeof(UiText).Assembly);
+
+    public static string AppTitle => Get();
+    public static string BrandLine1 => Get();
+    public static string BrandLine2 => Get();
+    public static string StepWelcome => Get();
+    public static string StepDrive => Get();
+    public static string StepConfirm => Get();
+    public static string StepWrite => Get();
+    public static string WelcomeHeading => Get();
+    public static string WelcomeSubheading => Get();
+    public static string WelcomeWhatWillHappen => Get();
+    public static string WelcomeBulletEraseUsb => Get();
+    public static string WelcomeBulletDownloadHaos => Get();
+    public static string WelcomeBulletBootTarget => Get();
+    public static string WelcomeBulletOnlineCheck => Get();
+    public static string WelcomeBulletInstallTarget => Get();
+    public static string WelcomeBulletReboot => Get();
+    public static string ButtonGetStarted => Get();
+    public static string DriveHeading => Get();
+    public static string DriveSubheading => Get();
+    public static string DriveScanning => Get();
+    public static string ButtonRefresh => Get();
+    public static string DriveEmpty => Get();
+    public static string DriveLarge => Get();
+    public static string DriveHaosInstaller => Get();
+    public static string DriveWindowsLayout => Get();
+    public static string DriveDetailSeparator => Get();
+    public static string ButtonBack => Get();
+    public static string ButtonContinue => Get();
+    public static string ConfirmHeading => Get();
+    public static string ConfirmSubheading => Get();
+    public static string ConfirmTargetUsb => Get();
+    public static string ConfirmSize => Get();
+    public static string ConfirmDevicePath => Get();
+    public static string ConfirmStatus => Get();
+    public static string ConfirmEraseText => Get();
+    public static string UnattendedTitle => Get();
+    public static string UnattendedWarning => Get();
+    public static string UnattendedConfirmText => Get();
+    public static string ButtonStartWrite => Get();
+    public static string WriteHeading => Get();
+    public static string WriteSubheading => Get();
+    public static string WritePrepareTitle => Get();
+    public static string WriteBootTitle => Get();
+    public static string WriteDownloadTitle => Get();
+    public static string WriteCopyTitle => Get();
+    public static string WriteBadgeWaiting => Get();
+    public static string WriteBadgeWorking => Get();
+    public static string WriteBadgeDone => Get();
+    public static string WriteBadgeBlocked => Get();
+    public static string WritePrepareInitial => Get();
+    public static string WriteBootInitial => Get();
+    public static string WriteDownloadInitial => Get();
+    public static string WriteCopyInitial => Get();
+    public static string WriteErrorIcon => Get();
+    public static string FinishHeading => Get();
+    public static string FinishSummaryDefault => Get();
+    public static string FinishSummaryNoPayload => Get();
+    public static string FinishSummaryWithPayload => Get();
+    public static string FinishNextStepAttended => Get();
+    public static string FinishNextStepUnattended => Get();
+    public static string BuyMeCoffeeShortText => Get();
+    public static string BuyMeCoffeeTooltip => Get();
+    public static string ButtonStartOver => Get();
+    public static string ProgressCheckingLatestHaos => Get();
+    public static string ProgressLatestImageFormat => Get();
+    public static string ProgressHaosReady => Get();
+    public static string ProgressSkippedFormat => Get();
+    public static string ProgressPrepareInstaller => Get();
+    public static string ProgressInstallerReady => Get();
+    public static string ProgressCopyUnavailable => Get();
+    public static string ProgressVerifyingHaos => Get();
+    public static string ProgressVerifyingPrefix => Get();
+    public static string ErrorBootImageNotFound => Get();
+    public static string ErrorSelectUsbDrive => Get();
+    public static string ErrorScanUsbFormat => Get();
+    public static string DriveFallbackModel => Get();
+    public static string DriveStatusExistingHaos => Get();
+    public static string DriveStatusWindowsLayout => Get();
+    public static string DriveStatusReady => Get();
+    public static string UnknownSize => Get();
+
+    private static string Get([System.Runtime.CompilerServices.CallerMemberName] string key = "") =>
+        ResourceManager.GetString(key, CultureInfo.CurrentUICulture) ?? key;
+}

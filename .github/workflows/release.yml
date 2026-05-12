@@ -1,0 +1,104 @@
+name: Release Build
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  boot-image:
+    name: Build Linux boot image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build boot image
+        run: bash ./src/InstallerLinux/build/build-installer-image.sh ./artifacts/installer-linux
+
+      - name: Package boot image release zip
+        run: |
+          cd artifacts/installer-linux
+          zip -9 ../HAOS-USB-Creator-boot-image.zip \
+            haos-installer-x86_64.img \
+            haos-installer-x86_64.img.sha256 \
+            haos-installer-x86_64.img.manifest.json
+
+      - name: Upload boot image
+        uses: actions/upload-artifact@v4
+        with:
+          name: haos-usb-creator-boot-image
+          path: |
+            artifacts/installer-linux/haos-installer-x86_64.img
+            artifacts/installer-linux/haos-installer-x86_64.img.sha256
+            artifacts/installer-linux/haos-installer-x86_64.img.manifest.json
+          if-no-files-found: error
+
+      - name: Upload boot image release zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: haos-usb-creator-boot-image-zip
+          path: artifacts/HAOS-USB-Creator-boot-image.zip
+          if-no-files-found: error
+
+  windows-app:
+    name: Publish Windows app
+    runs-on: windows-latest
+    needs: boot-image
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Download boot image
+        uses: actions/download-artifact@v4
+        with:
+          name: haos-usb-creator-boot-image
+          path: src/WindowsApp/src/HAOSInstaller.App/Assets/BootImage
+
+      - name: Download boot image release zip
+        uses: actions/download-artifact@v4
+        with:
+          name: haos-usb-creator-boot-image-zip
+          path: publish
+
+      - name: Validate bundled boot image
+        run: powershell -ExecutionPolicy Bypass -File .\src\WindowsApp\validate-bundled-boot-image.ps1
+
+      - name: Test
+        run: dotnet test .\src\WindowsApp\HAOSInstaller.slnx -c Release -p:Platform=x64
+
+      - name: Publish
+        run: dotnet publish .\src\WindowsApp\src\HAOSInstaller.App\HAOSInstaller.App.csproj -c Release -r win-x64 --self-contained true -p:Platform=x64 -o .\publish\win-x64
+
+      - name: Package Windows app
+        run: |
+          if (Test-Path .\publish\HAOS-USB-Creator-win-x64.zip) {
+            Remove-Item .\publish\HAOS-USB-Creator-win-x64.zip -Force
+          }
+          7z a -tzip .\publish\HAOS-USB-Creator-win-x64.zip .\publish\win-x64\*
+
+      - name: Upload Windows app
+        uses: actions/upload-artifact@v4
+        with:
+          name: haos-usb-creator-win-x64
+          path: publish/HAOS-USB-Creator-win-x64.zip
+          if-no-files-found: error
+
+      - name: Attach files to GitHub release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            publish/HAOS-USB-Creator-win-x64.zip
+            publish/HAOS-USB-Creator-boot-image.zip

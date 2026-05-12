@@ -1,0 +1,360 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppTitle" xml:space="preserve">
+    <value>HAOS AIO USB Creator</value>
+  </data>
+  <data name="BrandLine1" xml:space="preserve">
+    <value>HAOS AIO</value>
+  </data>
+  <data name="BrandLine2" xml:space="preserve">
+    <value>USB Creator</value>
+  </data>
+  <data name="StepWelcome" xml:space="preserve">
+    <value>1. Welcome</value>
+  </data>
+  <data name="StepDrive" xml:space="preserve">
+    <value>2. USB drive</value>
+  </data>
+  <data name="StepConfirm" xml:space="preserve">
+    <value>3. Review</value>
+  </data>
+  <data name="StepWrite" xml:space="preserve">
+    <value>4. Writing</value>
+  </data>
+  <data name="WelcomeHeading" xml:space="preserve">
+    <value>Create an all-in-one HAOS install USB</value>
+  </data>
+  <data name="WelcomeSubheading" xml:space="preserve">
+    <value>Unofficial USB creator for installing Home Assistant OS on a dedicated generic x86-64 PC.</value>
+  </data>
+  <data name="WelcomeWhatWillHappen" xml:space="preserve">
+    <value>What will happen</value>
+  </data>
+  <data name="WelcomeBulletEraseUsb" xml:space="preserve">
+    <value>- This app will erase the selected USB drive and turn it into an all-in-one install USB.</value>
+  </data>
+  <data name="WelcomeBulletDownloadHaos" xml:space="preserve">
+    <value>- It will download the latest Home Assistant OS generic x86-64 image and copy it to the USB.</value>
+  </data>
+  <data name="WelcomeBulletBootTarget" xml:space="preserve">
+    <value>- Boot the target PC from the USB in UEFI mode with Secure Boot disabled.</value>
+  </data>
+  <data name="WelcomeBulletOnlineCheck" xml:space="preserve">
+    <value>- The installer on the USB will check for a newer Home Assistant OS image if internet is available.</value>
+  </data>
+  <data name="WelcomeBulletInstallTarget" xml:space="preserve">
+    <value>- On the target PC, you will choose the internal drive, confirm the erase warning, and install Home Assistant OS.</value>
+  </data>
+  <data name="WelcomeBulletReboot" xml:space="preserve">
+    <value>- Reboot.</value>
+  </data>
+  <data name="ButtonGetStarted" xml:space="preserve">
+    <value>Get Started</value>
+  </data>
+  <data name="DriveHeading" xml:space="preserve">
+    <value>Select your USB drive</value>
+  </data>
+  <data name="DriveSubheading" xml:space="preserve">
+    <value>Choose the USB stick that will receive the Linux installer environment. The selected USB will be erased when you confirm the write.</value>
+  </data>
+  <data name="DriveScanning" xml:space="preserve">
+    <value>Scanning for USB drives...</value>
+  </data>
+  <data name="ButtonRefresh" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
+  <data name="DriveEmpty" xml:space="preserve">
+    <value>No removable USB drives detected.</value>
+  </data>
+  <data name="DriveLarge" xml:space="preserve">
+    <value>Large drive</value>
+  </data>
+  <data name="DriveHaosInstaller" xml:space="preserve">
+    <value>HAOS install USB</value>
+  </data>
+  <data name="DriveWindowsLayout" xml:space="preserve">
+    <value>Windows layout</value>
+  </data>
+  <data name="DriveDetailSeparator" xml:space="preserve">
+    <value>  -  </value>
+  </data>
+  <data name="ButtonBack" xml:space="preserve">
+    <value>Back</value>
+  </data>
+  <data name="ButtonContinue" xml:space="preserve">
+    <value>Continue</value>
+  </data>
+  <data name="ConfirmHeading" xml:space="preserve">
+    <value>Review and confirm</value>
+  </data>
+  <data name="ConfirmSubheading" xml:space="preserve">
+    <value>Check the selected USB drive before writing. This USB will be completely erased.</value>
+  </data>
+  <data name="ConfirmTargetUsb" xml:space="preserve">
+    <value>Target USB</value>
+  </data>
+  <data name="ConfirmSize" xml:space="preserve">
+    <value>Size</value>
+  </data>
+  <data name="ConfirmDevicePath" xml:space="preserve">
+    <value>Device path</value>
+  </data>
+  <data name="ConfirmStatus" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="ConfirmEraseText" xml:space="preserve">
+    <value>I understand this will erase the selected USB drive and create an all-in-one HAOS install USB.</value>
+  </data>
+  <data name="UnattendedTitle" xml:space="preserve">
+    <value>Unattended. Installs to the internal disk without user interaction</value>
+  </data>
+  <data name="UnattendedWarning" xml:space="preserve">
+    <value>Only use this on a dedicated system with one disk. Installer should fall back to a choice if more than one disk is detected during install. If you plan to keep the USB after creating it, LABEL IT!!!.</value>
+  </data>
+  <data name="UnattendedConfirmText" xml:space="preserve">
+    <value>I understand the booted installer will automatically erase the detected internal target disk without asking me again.</value>
+  </data>
+  <data name="ButtonStartWrite" xml:space="preserve">
+    <value>Start write</value>
+  </data>
+  <data name="WriteHeading" xml:space="preserve">
+    <value>Creating all-in-one install USB</value>
+  </data>
+  <data name="WriteSubheading" xml:space="preserve">
+    <value>Do not remove the USB drive or close this window.</value>
+  </data>
+  <data name="WritePrepareTitle" xml:space="preserve">
+    <value>1 - Prepare installer environment</value>
+  </data>
+  <data name="WriteBootTitle" xml:space="preserve">
+    <value>2 - Write boot environment to USB</value>
+  </data>
+  <data name="WriteDownloadTitle" xml:space="preserve">
+    <value>3 - Download Home Assistant OS</value>
+  </data>
+  <data name="WriteCopyTitle" xml:space="preserve">
+    <value>4 - Copy HAOS image to USB</value>
+  </data>
+  <data name="WriteBadgeWaiting" xml:space="preserve">
+    <value>Waiting</value>
+  </data>
+  <data name="WriteBadgeWorking" xml:space="preserve">
+    <value>Working...</value>
+  </data>
+  <data name="WriteBadgeDone" xml:space="preserve">
+    <value>Done</value>
+  </data>
+  <data name="WriteBadgeBlocked" xml:space="preserve">
+    <value>Blocked</value>
+  </data>
+  <data name="WritePrepareInitial" xml:space="preserve">
+    <value>Checking bundled installer image.</value>
+  </data>
+  <data name="WriteBootInitial" xml:space="preserve">
+    <value>Waiting</value>
+  </data>
+  <data name="WriteDownloadInitial" xml:space="preserve">
+    <value>Fetches the latest HAOS release.</value>
+  </data>
+  <data name="WriteCopyInitial" xml:space="preserve">
+    <value>Waiting</value>
+  </data>
+  <data name="WriteErrorIcon" xml:space="preserve">
+    <value>X</value>
+  </data>
+  <data name="FinishHeading" xml:space="preserve">
+    <value>Install USB is ready</value>
+  </data>
+  <data name="FinishSummaryDefault" xml:space="preserve">
+    <value>Home Assistant OS has been added to the USB.</value>
+  </data>
+  <data name="FinishSummaryNoPayload" xml:space="preserve">
+    <value>The install USB is ready. This installer does not include the Home Assistant OS  image, the Linux installer will download it if the internet is available.</value>
+  </data>
+  <data name="FinishSummaryWithPayload" xml:space="preserve">
+    <value>The install USB is ready. This installer does include the Home Assistant OS  image, the Linux installer will check for newer versions if the internet is available.</value>
+  </data>
+  <data name="ButtonStartOver" xml:space="preserve">
+    <value>Start over</value>
+  </data>
+  <data name="ProgressCheckingLatestHaos" xml:space="preserve">
+    <value>Checking for the latest Home Assistant OS image.</value>
+  </data>
+  <data name="ProgressLatestImageFormat" xml:space="preserve">
+    <value>Latest image: {0}</value>
+  </data>
+  <data name="ProgressHaosReady" xml:space="preserve">
+    <value>Home Assistant OS image is ready.</value>
+  </data>
+  <data name="ProgressSkippedFormat" xml:space="preserve">
+    <value>Skipped: {0}</value>
+  </data>
+  <data name="ProgressPrepareInstaller" xml:space="preserve">
+    <value>Preparing installer environment.</value>
+  </data>
+  <data name="ProgressInstallerReady" xml:space="preserve">
+    <value>Installer environment ready.</value>
+  </data>
+  <data name="ProgressCopyUnavailable" xml:space="preserve">
+    <value>Home Assistant OS was not copied. The Linux installer will download it if the internet is available.</value>
+  </data>
+  <data name="ProgressVerifyingHaos" xml:space="preserve">
+    <value>Verifying Home Assistant OS image.</value>
+  </data>
+  <data name="ProgressVerifyingPrefix" xml:space="preserve">
+    <value>Verifying image hash:</value>
+  </data>
+  <data name="ErrorBootImageNotFound" xml:space="preserve">
+    <value>Bundled HAOS AIO boot image was not found.</value>
+  </data>
+  <data name="ErrorSelectUsbDrive" xml:space="preserve">
+    <value>Select a removable USB drive.</value>
+  </data>
+  <data name="ErrorScanUsbFormat" xml:space="preserve">
+    <value>Could not scan USB drives: {0}</value>
+  </data>
+  <data name="DriveFallbackModel" xml:space="preserve">
+    <value>USB drive</value>
+  </data>
+  <data name="DriveStatusExistingHaos" xml:space="preserve">
+    <value>Existing HAOS install USB. It will be overwritten.</value>
+  </data>
+  <data name="DriveStatusWindowsLayout" xml:space="preserve">
+    <value>Existing Windows-style partitions detected. They will be erased.</value>
+  </data>
+  <data name="DriveStatusReady" xml:space="preserve">
+    <value>Ready to create an all-in-one HAOS install USB.</value>
+  </data>
+  <data name="UnknownSize" xml:space="preserve">
+    <value>Unknown size</value>
+  </data>
+  <data name="BuyMeCoffeeShortText" xml:space="preserve">
+    <value>If this saved you some time</value>
+  </data>
+  <data name="BuyMeCoffeeTooltip" xml:space="preserve">
+    <value>If this saved you some time, feel free to buy me a coffee!</value>
+  </data>
+  <data name="FinishNextStepAttended" xml:space="preserve">
+    <value>When the Linux installer starts, it will check the Home Assistant OS image on the USB, look online for a newer verified image, and use the newest valid option. It will then show the internal drives it can install to, ask you to choose the target disk, show a clear erase warning, write Home Assistant OS, set up boot where possible, and reboot when finished.</value>
+  </data>
+  <data name="FinishNextStepUnattended" xml:space="preserve">
+    <value>When the Linux installer starts, it will check the Home Assistant OS image on the USB, look online for a newer verified image, and use the newest valid option automatically. Because unattended mode is enabled, it will continue only when it finds one eligible internal disk, erase that disk, write Home Assistant OS, set up boot drive where possible and reboot when finished. Unattended setups are marked on install USB so install loops should have protection for clean installs.</value>
+  </data>
+</root>

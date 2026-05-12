@@ -1,0 +1,39 @@
+# Build outputs
+/bin/
+/obj/
+src/WindowsApp/**/bin/
+src/WindowsApp/**/obj/
+
+# Local build artifacts and publish outputs
+artifacts/
+publish/
+releases/
+
+# Local project notes and scratch test helpers
+/docs/
+/scripts/
+/tests/
+
+*.nupkg
+*.snupkg
+
+# Large generated boot images. Publish these as release assets instead of git files.
+src/WindowsApp/src/HAOSInstaller.App/Assets/BootImage/*.img
+src/WindowsApp/src/HAOSInstaller.App/Assets/BootImage/*.iso
+src/WindowsApp/src/HAOSInstaller.App/Assets/BootImage/*.usb
+src/WindowsApp/src/HAOSInstaller.App/Assets/BootImage/*.sha256
+src/WindowsApp/src/HAOSInstaller.App/Assets/BootImage/*.manifest.json
+
+# Downloaded Home Assistant OS images
+haos_generic-*.img
+haos_generic-*.img.xz
+haos_generic-*.img.xz.sha256
+
+# User/local files
+*.log
+*.tmp
+*.bak
+.vs/
+.vscode/
+Thumbs.db
+Desktop.ini

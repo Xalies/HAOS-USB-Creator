@@ -1,0 +1,20 @@
+#!/bin/sh
+set +e
+
+export TERM="${TERM:-linux}"
+
+clear 2>/dev/null || true
+printf '%s\n' 'HAOS AIO Installer USB'
+printf '%s\n' 'Console: /dev/tty1'
+printf '%s\n' 'Debug shell: Alt+F2'
+printf '\n'
+
+/usr/local/bin/haos-installer-run
+status=$?
+
+printf '\n'
+printf 'The installer stopped before it could continue. Exit code: %s\n' "$status"
+printf 'Press Enter to open a shell, or press Ctrl+Alt+Del to reboot.\n'
+read -r _unused 2>/dev/null || true
+
+exec /bin/sh -l

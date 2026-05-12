@@ -1,0 +1,203 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Color x:Key="HABlueColor">#41BDF5</Color>
+    <Color x:Key="HADarkColor">#1C1C2E</Color>
+    <Color x:Key="HASurfaceColor">#F7F7F9</Color>
+    <Color x:Key="HABorderColor">#E0E0E6</Color>
+    <Color x:Key="HATextPrimaryColor">#1A1A2E</Color>
+    <Color x:Key="HATextSecondaryColor">#6B7280</Color>
+    <Color x:Key="HADangerColor">#EF4444</Color>
+    <Color x:Key="HASuccessColor">#22C55E</Color>
+    <Color x:Key="HAWarningColor">#F59E0B</Color>
+
+    <SolidColorBrush x:Key="HABlueBrush" Color="{StaticResource HABlueColor}" />
+    <SolidColorBrush x:Key="HADarkBrush" Color="{StaticResource HADarkColor}" />
+    <SolidColorBrush x:Key="HASurfaceBrush" Color="{StaticResource HASurfaceColor}" />
+    <SolidColorBrush x:Key="HABorderBrush" Color="{StaticResource HABorderColor}" />
+    <SolidColorBrush x:Key="HATextPrimaryBrush" Color="{StaticResource HATextPrimaryColor}" />
+    <SolidColorBrush x:Key="HATextSecondaryBrush" Color="{StaticResource HATextSecondaryColor}" />
+    <SolidColorBrush x:Key="HADangerBrush" Color="{StaticResource HADangerColor}" />
+    <SolidColorBrush x:Key="HASuccessBrush" Color="{StaticResource HASuccessColor}" />
+    <SolidColorBrush x:Key="HAWarningBrush" Color="{StaticResource HAWarningColor}" />
+
+    <Style x:Key="HeadingStyle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="Segoe UI" />
+        <Setter Property="FontSize" Value="24" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{StaticResource HATextPrimaryBrush}" />
+        <Setter Property="Margin" Value="0,0,0,6" />
+    </Style>
+
+    <Style x:Key="SubheadingStyle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="Segoe UI" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="Foreground" Value="{StaticResource HATextSecondaryBrush}" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="LineHeight" Value="20" />
+    </Style>
+
+    <Style x:Key="BodyStyle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="Segoe UI" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="Foreground" Value="{StaticResource HATextPrimaryBrush}" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+
+    <Style x:Key="CaptionStyle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="Segoe UI" />
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="Foreground" Value="{StaticResource HATextSecondaryBrush}" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+
+    <Style x:Key="PrimaryButton" TargetType="Button">
+        <Setter Property="Background" Value="{StaticResource HABlueBrush}" />
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="FontFamily" Value="Segoe UI" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Padding" Value="24,10" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="border"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="6"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#2BA8E0" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#1A90C8" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="border" Property="Background" Value="#B0D8F0" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="SecondaryButton" TargetType="Button">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{StaticResource HATextSecondaryBrush}" />
+        <Setter Property="FontFamily" Value="Segoe UI" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="Padding" Value="20,10" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="BorderBrush" Value="{StaticResource HABorderBrush}" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="border"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="6"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#F0F0F5" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="#C0C0C8" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="DangerButton" TargetType="Button" BasedOn="{StaticResource PrimaryButton}">
+        <Setter Property="Background" Value="{StaticResource HADangerBrush}" />
+    </Style>
+
+    <Style x:Key="CardStyle" TargetType="Border">
+        <Setter Property="Background" Value="White" />
+        <Setter Property="BorderBrush" Value="{StaticResource HABorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Padding" Value="18,14" />
+    </Style>
+
+    <Style x:Key="DriveListBoxItemStyle" TargetType="ListBoxItem">
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Margin" Value="0,0,0,8" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListBoxItem">
+                    <ContentPresenter
+                        HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="DriveCardStyle" TargetType="Border">
+        <Setter Property="Background" Value="White" />
+        <Setter Property="BorderBrush" Value="{StaticResource HABorderBrush}" />
+        <Setter Property="BorderThickness" Value="1.5" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Padding" Value="16,12" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
+                <Setter Property="BorderBrush" Value="{StaticResource HABlueBrush}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
+                <Setter Property="BorderBrush" Value="{StaticResource HABlueBrush}" />
+                <Setter Property="Background" Value="#F3FBFF" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="DrivePillTextStyle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="Segoe UI" />
+        <Setter Property="FontSize" Value="10" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="TextWrapping" Value="NoWrap" />
+    </Style>
+
+    <Style x:Key="DrivePillStyle" TargetType="Border">
+        <Setter Property="CornerRadius" Value="9" />
+        <Setter Property="Padding" Value="8,3" />
+        <Setter Property="Margin" Value="0,6,6,0" />
+        <Setter Property="Background" Value="#EEF2F7" />
+        <Setter Property="BorderBrush" Value="#D7DEE8" />
+        <Setter Property="BorderThickness" Value="1" />
+    </Style>
+
+    <Style x:Key="DrivePillUsbStyle" TargetType="Border" BasedOn="{StaticResource DrivePillStyle}">
+        <Setter Property="Background" Value="#E8F7FE" />
+        <Setter Property="BorderBrush" Value="#9ADEFA" />
+    </Style>
+
+    <Style x:Key="DrivePillSizeStyle" TargetType="Border" BasedOn="{StaticResource DrivePillStyle}">
+        <Setter Property="Background" Value="#ECFDF3" />
+        <Setter Property="BorderBrush" Value="#B7E4C7" />
+    </Style>
+
+    <Style x:Key="DrivePillWarningStyle" TargetType="Border" BasedOn="{StaticResource DrivePillStyle}">
+        <Setter Property="Background" Value="#FFF7ED" />
+        <Setter Property="BorderBrush" Value="#FDBA74" />
+    </Style>
+
+    <Style x:Key="DrivePillDangerStyle" TargetType="Border" BasedOn="{StaticResource DrivePillStyle}">
+        <Setter Property="Background" Value="#FEF2F2" />
+        <Setter Property="BorderBrush" Value="#FCA5A5" />
+    </Style>
+</ResourceDictionary>

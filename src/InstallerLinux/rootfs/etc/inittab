@@ -1,0 +1,11 @@
+::sysinit:/sbin/openrc sysinit
+::sysinit:/sbin/openrc boot
+::once:/sbin/openrc default
+
+tty1::respawn:/sbin/getty -n -l /usr/local/bin/haos-installer-autostart 0 tty1
+ttyS0::respawn:/sbin/getty -n -l /usr/local/bin/haos-installer-autostart 115200 ttyS0
+tty2::respawn:/sbin/getty 38400 tty2
+tty3::respawn:/sbin/getty 38400 tty3
+
+::ctrlaltdel:/sbin/reboot
+::shutdown:/sbin/openrc shutdown
