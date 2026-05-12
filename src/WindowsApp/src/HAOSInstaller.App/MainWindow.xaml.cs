@@ -198,34 +198,14 @@ public partial class MainWindow : Window
 
                 if (stagedPayload is not null)
                 {
-                    var cacheRoot = await _usbCacheVolumeLocator.WaitForCacheRootAsync(
-                        new Progress<ImageWriteProgress>(ReportCopyPayloadProgress),
-                        TimeSpan.FromSeconds(90),
-                        CancellationToken.None);
-
-                    _usbDriveLetterHider.HideHaosVolumes(new Progress<ImageWriteProgress>(_ => { }));
-                    await _usbCacheProvisioningService.WriteInstallerConfigAsync(
-                        cacheRoot,
+                    await ProvisionUsbCacheWithRetryAsync(
+                        stagedPayload,
                         unattendedInstall,
                         CancellationToken.None);
-
-                    await _usbCacheProvisioningService.ProvisionAsync(
-                        stagedPayload,
-                        cacheRoot,
-                        new Progress<ImageWriteProgress>(ReportCopyPayloadProgress),
-                        CancellationToken.None);
-
-                    _usbDriveLetterHider.HideHaosVolumes(new Progress<ImageWriteProgress>(_ => { }));
                 }
                 else
                 {
-                    var cacheRoot = await _usbCacheVolumeLocator.WaitForCacheRootAsync(
-                        new Progress<ImageWriteProgress>(ReportCopyPayloadProgress),
-                        TimeSpan.FromSeconds(90),
-                        CancellationToken.None);
-
-                    await _usbCacheProvisioningService.WriteInstallerConfigAsync(
-                        cacheRoot,
+                    await WriteInstallerConfigWithRetryAsync(
                         unattendedInstall,
                         CancellationToken.None);
 
@@ -247,6 +227,98 @@ public partial class MainWindow : Window
             ShowWriteError(ex.Message);
             AppendLog($"Blocked: {ex.Message}");
         });
+    }
+
+    private async Task ProvisionUsbCacheWithRetryAsync(
+        HaosPayloadStageResult stagedPayload,
+        bool unattendedInstall,
+        CancellationToken cancellationToken)
+    {
+        await RetryUsbCacheAccessAsync(async cacheRoot =>
+        {
+            await _usbCacheProvisioningService.WriteInstallerConfigAsync(
+                cacheRoot,
+                unattendedInstall,
+                cancellationToken);
+
+            await _usbCacheProvisioningService.ProvisionAsync(
+                stagedPayload,
+                cacheRoot,
+                new Progress<ImageWriteProgress>(ReportCopyPayloadProgress),
+                cancellationToken);
+        }, cancellationToken);
+    }
+
+    private async Task WriteInstallerConfigWithRetryAsync(
+        bool unattendedInstall,
+        CancellationToken cancellationToken)
+    {
+        await RetryUsbCacheAccessAsync(async cacheRoot =>
+        {
+            await _usbCacheProvisioningService.WriteInstallerConfigAsync(
+                cacheRoot,
+                unattendedInstall,
+                cancellationToken);
+        }, cancellationToken);
+    }
+
+    private async Task RetryUsbCacheAccessAsync(
+        Func<string, Task> operation,
+        CancellationToken cancellationToken)
+    {
+        const int maxAttempts = 4;
+        var progress = new Progress<ImageWriteProgress>(ReportCopyPayloadProgress);
+        Exception? lastError = null;
+
+        for (var attempt = 1; attempt <= maxAttempts; attempt++)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            try
+            {
+                if (attempt == 1)
+                {
+                    ReportCopyPayloadProgress(new ImageWriteProgress("Waiting for Windows to finish preparing the USB.", 0));
+                    await Task.Delay(TimeSpan.FromSeconds(3), cancellationToken);
+                }
+                else
+                {
+                    ReportCopyPayloadProgress(new ImageWriteProgress($"USB was busy. Retrying copy setup ({attempt} of {maxAttempts}).", 0));
+                    await Task.Delay(TimeSpan.FromSeconds(2 + attempt), cancellationToken);
+                }
+
+                _usbDriveLetterHider.HideHaosVolumes(new Progress<ImageWriteProgress>(_ => { }));
+
+                var cacheRoot = await _usbCacheVolumeLocator.WaitForCacheRootAsync(
+                    progress,
+                    TimeSpan.FromSeconds(90),
+                    cancellationToken);
+
+                _usbDriveLetterHider.HideHaosVolumes(new Progress<ImageWriteProgress>(_ => { }));
+                await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
+
+                await operation(cacheRoot);
+                _usbDriveLetterHider.HideHaosVolumes(new Progress<ImageWriteProgress>(_ => { }));
+                return;
+            }
+            catch (Exception ex) when (IsTransientUsbAccessError(ex) && attempt < maxAttempts)
+            {
+                lastError = ex;
+                AppendLog($"USB cache access retry {attempt}: {ex.Message}");
+                _usbDriveLetterHider.HideHaosVolumes(new Progress<ImageWriteProgress>(_ => { }));
+            }
+        }
+
+        if (lastError is not null)
+        {
+            throw lastError;
+        }
+    }
+
+    private static bool IsTransientUsbAccessError(Exception ex)
+    {
+        return ex is IOException or UnauthorizedAccessException
+            || (ex.InnerException is not null && IsTransientUsbAccessError(ex.InnerException));
     }
 
     private void StartOver_Click(object sender, RoutedEventArgs e)

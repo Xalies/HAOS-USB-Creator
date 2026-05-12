@@ -151,6 +151,7 @@ public sealed class UsbCacheVolumeLocator
                 {
                     progress.Report(new ImageWriteProgress("Preparing the USB for copying.", 70));
                     RemoveDriveLetter(volume.DriveLetter, progress);
+                    await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
                 }
 
                 var root = EnsureTrailingSlash(volume.DeviceId);

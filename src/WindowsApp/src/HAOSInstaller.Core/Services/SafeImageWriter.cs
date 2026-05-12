@@ -11,6 +11,7 @@ namespace HAOSInstaller.Core.Services;
 public sealed class SafeImageWriter(DiskWriteGuard guard) : IImageWriter
 {
     private const int BufferSize = 4 * 1024 * 1024;
+    private const int RawWriteChunkSize = 1024 * 1024;
 
     public async Task WriteAsync(
         ImageWriteRequest request,
@@ -74,9 +75,17 @@ public sealed class SafeImageWriter(DiskWriteGuard guard) : IImageWriter
 
         progress.Report(new ImageWriteProgress($"Writing boot image to {request.Target.DevicePath}. Do not remove the USB.", 0));
 
+        var targetDiskNumber = GetDiskNumberFromDevicePath(request.Target.DevicePath);
+        var diskTakenOffline = false;
+
         try
         {
             CleanDiskPartitionTable(request.Target.DevicePath, progress);
+            if (targetDiskNumber is not null)
+            {
+                diskTakenOffline = TrySetDiskOnlineState(targetDiskNumber.Value, online: false, progress);
+                Thread.Sleep(1000);
+            }
 
             await using var source = new FileStream(
                 request.SourceImagePath,
@@ -101,7 +110,7 @@ public sealed class SafeImageWriter(DiskWriteGuard guard) : IImageWriter
 
             while ((read = await source.ReadAsync(buffer, cancellationToken)) > 0)
             {
-                WriteAll(targetHandle, buffer, read, request.Target.DevicePath);
+                WriteAll(targetHandle, buffer, read, request.Target.DevicePath, progress);
                 copied += read;
                 var percent = sourceInfo.Length == 0 ? 100 : copied * 100d / sourceInfo.Length;
                 progress.Report(new ImageWriteProgress($"Wrote {copied:N0} of {sourceInfo.Length:N0} bytes.", percent));
@@ -120,6 +129,12 @@ public sealed class SafeImageWriter(DiskWriteGuard guard) : IImageWriter
             foreach (var volume in lockedVolumes)
             {
                 volume.Dispose();
+            }
+
+            if (diskTakenOffline && targetDiskNumber is not null)
+            {
+                TrySetDiskOnlineState(targetDiskNumber.Value, online: true, progress);
+                Thread.Sleep(1500);
             }
         }
     }
@@ -325,6 +340,64 @@ public sealed class SafeImageWriter(DiskWriteGuard guard) : IImageWriter
         }
     }
 
+    private static bool TrySetDiskOnlineState(int diskNumber, bool online, IProgress<ImageWriteProgress> progress)
+    {
+        var action = online ? "online" : "offline";
+        var scriptPath = Path.Combine(Path.GetTempPath(), $"haos-installer-diskpart-{Guid.NewGuid():N}.txt");
+        File.WriteAllText(
+            scriptPath,
+            string.Join(
+                Environment.NewLine,
+                $"select disk {diskNumber}",
+                online ? "online disk noerr" : "offline disk noerr",
+                online ? "rescan" : string.Empty,
+                string.Empty));
+
+        try
+        {
+            progress.Report(new ImageWriteProgress($"Setting Disk {diskNumber} {action} for USB writing."));
+            using var process = Process.Start(new ProcessStartInfo
+            {
+                FileName = "diskpart.exe",
+                Arguments = $"/s \"{scriptPath}\"",
+                CreateNoWindow = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false
+            });
+
+            if (process is null)
+            {
+                progress.Report(new ImageWriteProgress($"Could not start diskpart.exe to set Disk {diskNumber} {action}."));
+                return false;
+            }
+
+            var output = process.StandardOutput.ReadToEnd();
+            var error = process.StandardError.ReadToEnd();
+            process.WaitForExit();
+
+            if (process.ExitCode != 0)
+            {
+                progress.Report(new ImageWriteProgress($"Could not set Disk {diskNumber} {action}: {output} {error}".Trim()));
+                return false;
+            }
+
+            progress.Report(new ImageWriteProgress($"Disk {diskNumber} is {action}."));
+            return true;
+        }
+        finally
+        {
+            try
+            {
+                File.Delete(scriptPath);
+            }
+            catch
+            {
+                // Best-effort cleanup only.
+            }
+        }
+    }
+
     private static int? GetDiskNumberFromDevicePath(string devicePath)
     {
         const string prefix = @"\\.\PhysicalDrive";
@@ -368,17 +441,18 @@ public sealed class SafeImageWriter(DiskWriteGuard guard) : IImageWriter
         return false;
     }
 
-    private static void WriteAll(SafeFileHandle handle, byte[] buffer, int count, string devicePath)
+    private static void WriteAll(
+        SafeFileHandle handle,
+        byte[] buffer,
+        int count,
+        string devicePath,
+        IProgress<ImageWriteProgress> progress)
     {
         var offset = 0;
         while (offset < count)
         {
-            var bytesToWrite = count - offset;
-            if (!NativeMethods.WriteFile(handle, buffer.AsSpan(offset, bytesToWrite).ToArray(), (uint)bytesToWrite, out var written, IntPtr.Zero))
-            {
-                var error = Marshal.GetLastWin32Error();
-                throw new IOException($"Raw write to {devicePath} failed: {new Win32Exception(error).Message}", error);
-            }
+            var bytesToWrite = Math.Min(count - offset, RawWriteChunkSize);
+            var written = WriteChunkWithRetry(handle, buffer, offset, bytesToWrite, devicePath, progress);
 
             if (written == 0)
             {
@@ -387,6 +461,41 @@ public sealed class SafeImageWriter(DiskWriteGuard guard) : IImageWriter
 
             offset += (int)written;
         }
+    }
+
+    private static uint WriteChunkWithRetry(
+        SafeFileHandle handle,
+        byte[] buffer,
+        int offset,
+        int count,
+        string devicePath,
+        IProgress<ImageWriteProgress> progress)
+    {
+        const int attempts = 12;
+        var chunk = buffer.AsSpan(offset, count).ToArray();
+
+        for (var attempt = 1; attempt <= attempts; attempt++)
+        {
+            if (NativeMethods.WriteFile(handle, chunk, (uint)count, out var written, IntPtr.Zero))
+            {
+                return written;
+            }
+
+            var error = Marshal.GetLastWin32Error();
+            if (error != NativeMethods.ErrorAccessDenied && error != NativeMethods.ErrorSharingViolation)
+            {
+                throw new IOException($"Raw write to {devicePath} failed: {new Win32Exception(error).Message}", error);
+            }
+
+            if (attempt == 1)
+            {
+                progress.Report(new ImageWriteProgress($"Windows temporarily blocked raw USB writing; waiting and retrying."));
+            }
+
+            Thread.Sleep(TimeSpan.FromMilliseconds(750));
+        }
+
+        throw new IOException($"Raw write to {devicePath} failed: {new Win32Exception(NativeMethods.ErrorAccessDenied).Message}", NativeMethods.ErrorAccessDenied);
     }
 
     private static bool IsRunningAsAdministrator()
