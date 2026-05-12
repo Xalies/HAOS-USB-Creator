@@ -29,6 +29,14 @@ jobs:
             haos-installer-x86_64.img.sha256 \
             haos-installer-x86_64.img.manifest.json
 
+      - name: Package standalone ISO release zip
+        run: |
+          cd artifacts/installer-linux
+          zip -9 ../HAOS-Installer-ISO.zip \
+            haos-installer-x86_64.iso \
+            haos-installer-x86_64.iso.sha256 \
+            haos-installer-x86_64.iso.manifest.json
+
       - name: Upload boot image
         uses: actions/upload-artifact@v4
         with:
@@ -44,6 +52,13 @@ jobs:
         with:
           name: haos-usb-creator-boot-image-zip
           path: artifacts/HAOS-USB-Creator-boot-image.zip
+          if-no-files-found: error
+
+      - name: Upload standalone ISO release zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: haos-installer-iso-zip
+          path: artifacts/HAOS-Installer-ISO.zip
           if-no-files-found: error
 
   windows-app:
@@ -70,6 +85,12 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: haos-usb-creator-boot-image-zip
+          path: publish
+
+      - name: Download standalone ISO release zip
+        uses: actions/download-artifact@v4
+        with:
+          name: haos-installer-iso-zip
           path: publish
 
       - name: Validate bundled boot image
@@ -102,3 +123,4 @@ jobs:
           files: |
             publish/HAOS-USB-Creator-win-x64.zip
             publish/HAOS-USB-Creator-boot-image.zip
+            publish/HAOS-Installer-ISO.zip

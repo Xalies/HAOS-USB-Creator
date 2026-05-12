@@ -2,7 +2,7 @@
 
 This folder contains developer/release tooling for building the Alpine-based HAOS AIO Installer USB Linux environment.
 
-The product output is a HAOS AIO raw USB image. The normal build path creates that raw image directly as the only published boot image. Alpine's image builder is still used inside Docker to assemble the bootable Linux environment, but the repository no longer needs a separate ISO build step for the normal workflow.
+The primary product output is a HAOS AIO raw USB image. The build also keeps the generated bootable ISO as a secondary release artifact for VM-style testing and installs.
 
 End users should not run this builder. The Windows app should ship with the HAOS AIO boot image already bundled under `Assets/BootImage`.
 
@@ -38,6 +38,14 @@ Raw USB image output:
 - `haos-installer-x86_64.img`
 - matching `.sha256`
 - matching `.manifest.json`
+
+Standalone ISO output:
+
+- `haos-installer-x86_64.iso`
+- matching `.sha256`
+- matching `.manifest.json`
+
+The ISO boots the same Alpine installer environment, but it does not contain the writable `HAOS-CACHE` USB partition. It is intended for VMs and will normally download the Home Assistant OS generic x86-64 image during the Linux installer flow.
 
 The raw image contains a GPT layout with:
 

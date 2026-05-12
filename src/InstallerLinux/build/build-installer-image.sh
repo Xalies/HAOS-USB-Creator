@@ -76,6 +76,28 @@ if [ -z "$iso_path" ]; then
   exit 1
 fi
 
+iso_output="/out/haos-installer-x86_64.iso"
+rm -f "$iso_output" "${iso_output}.sha256" "${iso_output}.manifest.json"
+cp "$iso_path" "$iso_output"
+sha256sum "$iso_output" > "${iso_output}.sha256"
+
+iso_sha256="$(sha256sum "$iso_output" | awk '{ print $1 }')"
+iso_size_bytes="$(wc -c < "$iso_output" | tr -d ' ')"
+iso_built_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+{
+  printf '%s\n' '{'
+  printf '%s\n' '  "schemaVersion": 1,'
+  printf '%s\n' '  "artifactType": "haos_installer_iso",'
+  printf '%s\n' '  "format": "bootable-iso-image",'
+  printf '%s\n' '  "filename": "haos-installer-x86_64.iso",'
+  printf '%s\n' "  \"sha256\": \"$iso_sha256\","
+  printf '%s\n' "  \"fileSizeBytes\": $iso_size_bytes,"
+  printf '%s\n' "  \"builtAtUtc\": \"$iso_built_at\","
+  printf '%s\n' '  "builder": "src/InstallerLinux/build/build-installer-image.sh",'
+  printf '%s\n' '  "notes": "Standalone bootable installer ISO. Intended for VMs or optical-style boot media; it does not include the writable HAOS-CACHE USB partition."'
+  printf '%s\n' '}'
+} > "${iso_output}.manifest.json"
+
 xorriso -osirrox on -indev "$iso_path" -extract / /work/extract >/dev/null
 touch /work/extract/.boot_repository
 
