@@ -189,12 +189,31 @@ public partial class MainWindow : Window
                 ReportPrepareProgress(new ImageWriteProgress(UiText.ProgressInstallerReady, 100));
 
                 var request = BuildWriteRequest(validateOnly: false);
-                var payloadTask = PreparePayloadAsync();
-                var writeTask = _imageWriter.WriteAsync(request, new Progress<ImageWriteProgress>(ReportBootWriteProgress), CancellationToken.None);
+                ReportHaosDownloadProgress(new ImageWriteProgress("Waiting for the USB disk to be prepared.", 0));
+
+                var downloadStartSignal = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+                var bootWriteProgress = new Progress<ImageWriteProgress>(progress =>
+                {
+                    ReportBootWriteProgress(progress);
+                    if (IsSafeToStartHaosDownload(progress))
+                    {
+                        downloadStartSignal.TrySetResult();
+                    }
+                });
+
+                var writeTask = _imageWriter.WriteAsync(request, bootWriteProgress, CancellationToken.None);
+                var readyTask = await Task.WhenAny(writeTask, downloadStartSignal.Task);
+                Task<HaosPayloadStageResult?>? payloadTask = null;
+                if (readyTask == downloadStartSignal.Task)
+                {
+                    payloadTask = PreparePayloadAsync();
+                }
 
                 await writeTask;
                 _usbDriveLetterHider.HideHaosVolumes(new Progress<ImageWriteProgress>(_ => { }));
-                var stagedPayload = await payloadTask;
+                var stagedPayload = payloadTask is not null
+                    ? await payloadTask
+                    : await PreparePayloadAsync();
 
                 if (stagedPayload is not null)
                 {
@@ -319,6 +338,11 @@ public partial class MainWindow : Window
     {
         return ex is IOException or UnauthorizedAccessException
             || (ex.InnerException is not null && IsTransientUsbAccessError(ex.InnerException));
+    }
+
+    private static bool IsSafeToStartHaosDownload(ImageWriteProgress progress)
+    {
+        return progress.Message.Contains(" is offline.", StringComparison.OrdinalIgnoreCase);
     }
 
     private void StartOver_Click(object sender, RoutedEventArgs e)
