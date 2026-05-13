@@ -5,6 +5,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Platforms>AnyCPU;x64</Platforms>
+    <Authors>Sonny Gilbert</Authors>
+    <Company>Sonny Gilbert</Company>
+    <Copyright>Copyright (c) 2026 Sonny Gilbert</Copyright>
   </PropertyGroup>
 
   <ItemGroup>

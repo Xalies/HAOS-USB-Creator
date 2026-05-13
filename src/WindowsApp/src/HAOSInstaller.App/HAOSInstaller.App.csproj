@@ -21,6 +21,9 @@
     <Platforms>AnyCPU;x64</Platforms>
     <AssemblyName>HAOSAIOUsbCreator</AssemblyName>
     <Product>HAOS AIO USB Creator</Product>
+    <Authors>Sonny Gilbert</Authors>
+    <Company>Sonny Gilbert</Company>
+    <Copyright>Copyright (c) 2026 Sonny Gilbert</Copyright>
     <ApplicationIcon>Assets\AppIcon.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <PackageReadmeFile></PackageReadmeFile>
