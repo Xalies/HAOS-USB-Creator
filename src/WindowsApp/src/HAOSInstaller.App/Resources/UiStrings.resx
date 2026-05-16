@@ -154,7 +154,7 @@
     <value>- It will download the latest Home Assistant OS generic x86-64 image and copy it to the USB.</value>
   </data>
   <data name="WelcomeBulletBootTarget" xml:space="preserve">
-    <value>- Boot the target PC from the USB in UEFI mode with Secure Boot disabled.</value>
+    <value>- Boot the target PC from the USB and the installer will start automatically.</value>
   </data>
   <data name="WelcomeBulletOnlineCheck" xml:space="preserve">
     <value>- The installer on the USB will check for a newer Home Assistant OS image if internet is available.</value>
