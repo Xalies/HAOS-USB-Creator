@@ -8,6 +8,7 @@
     <Authors>Sonny Gilbert</Authors>
     <Company>Sonny Gilbert</Company>
     <Copyright>Copyright (c) 2026 Sonny Gilbert</Copyright>
+    <PackageLicenseExpression>AGPL-3.0-only</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>

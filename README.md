@@ -6,6 +6,8 @@ It creates a bootable USB installer, downloads the official Home Assistant OS ge
 
 This is not a normal Windows app installer. It is a disk imaging tool. It can erase drives.
 
+Copyright (C) 2026 Sonny Gilbert.
+
 ## Status
 
 This project is functional but still new.
@@ -54,8 +56,7 @@ Home Assistant OS images are downloaded from the official Home Assistant OS rele
 10. In unattended mode, install continues only when one eligible internal disk is detected.
 11. The installer writes Home Assistant OS to the target disk and reboots.
 
-I have put a few safe guards in place such as download images are always verified before any action is taken.
-Install loop protection for unattended installs should work for EFI and non EFI
+The tool includes safeguards such as image verification before use, explicit erase confirmations, and unattended install loop protection for both EFI and non-EFI fallback paths.
 
 
 ## Repository Layout
@@ -152,4 +153,6 @@ Do not commit generated boot images, Home Assistant OS downloads, or publish fol
 
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under the GNU Affero General Public License v3.0 only. See [LICENSE](LICENSE).
+
+Third-party components and downloaded images remain under their own upstream licenses. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
