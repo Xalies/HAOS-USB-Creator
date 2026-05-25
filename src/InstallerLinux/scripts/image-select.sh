@@ -13,7 +13,7 @@ select_install_image() {
   log_info "Selecting newest verified HAOS payload image."
   tui_status "Home Assistant OS Image" "Checking for a downloaded Home Assistant OS image on the USB."
 
-  cache_dir="$(find_cache_partition)"
+  cache_dir="$(find_cache_partition 2>/dev/null || true)"
   unattended=0
   if installer_unattended_enabled; then
     unattended=1
@@ -37,9 +37,10 @@ select_install_image() {
 
       if [ -z "$cached_image" ]; then
         log_info "No cached HAOS payload is available; downloading latest version $ONLINE_VERSION."
-        tui_status "Downloading Home Assistant OS" "Downloading $ONLINE_FILENAME to the USB.\n\nProgress and speed are shown on this screen."
+        cache_dir="$(find_writable_image_cache)"
+        tui_status "Downloading Home Assistant OS" "Downloading $ONLINE_FILENAME into temporary memory, then verifying it before install.\n\nProgress and speed are shown on this screen."
         if online_image="$(download_online_image "$release_info" "$cache_dir" 0)"; then
-          tui_status "Home Assistant OS Image" "Downloaded and verified $ONLINE_FILENAME on the USB."
+          tui_status "Home Assistant OS Image" "Downloaded and verified $ONLINE_FILENAME."
           printf '%s\n' "$online_image"
           return 0
         fi
@@ -48,9 +49,10 @@ select_install_image() {
         log_info "Online HAOS payload version $ONLINE_VERSION is newer than cached version $cached_version."
         if [ "$unattended" -eq 1 ]; then
           log_info "Unattended install enabled; downloading newer HAOS payload without prompting."
-          tui_status "Downloading Home Assistant OS" "Downloading $ONLINE_FILENAME to the USB.\n\nThe old cached image will be removed only after the new download is verified."
+          cache_dir="$(find_writable_image_cache)"
+          tui_status "Downloading Home Assistant OS" "Downloading $ONLINE_FILENAME, then verifying it before install.\n\nThe old cached image will be removed only after the new download is verified."
           if online_image="$(download_online_image "$release_info" "$cache_dir" 1)"; then
-            tui_status "Home Assistant OS Image" "Downloaded and verified $ONLINE_FILENAME on the USB."
+            tui_status "Home Assistant OS Image" "Downloaded and verified $ONLINE_FILENAME."
             printf '%s\n' "$online_image"
             return 0
           fi
@@ -60,9 +62,10 @@ select_install_image() {
           "The USB contains Home Assistant OS $cached_version.\n\nA newer generic x86-64 image is available:\n$ONLINE_VERSION\n\nDownload and use the newer image now?" \
           "Download" \
           "Use cached"; then
-          tui_status "Downloading Home Assistant OS" "Downloading $ONLINE_FILENAME to the USB.\n\nThe old cached image will be removed only after the new download is verified."
+          cache_dir="$(find_writable_image_cache)"
+          tui_status "Downloading Home Assistant OS" "Downloading $ONLINE_FILENAME, then verifying it before install.\n\nThe old cached image will be removed only after the new download is verified."
           if online_image="$(download_online_image "$release_info" "$cache_dir" 1)"; then
-            tui_status "Home Assistant OS Image" "Downloaded and verified $ONLINE_FILENAME on the USB."
+            tui_status "Home Assistant OS Image" "Downloaded and verified $ONLINE_FILENAME."
             printf '%s\n' "$online_image"
             return 0
           fi

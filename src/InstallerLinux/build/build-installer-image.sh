@@ -94,7 +94,7 @@ iso_built_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
   printf '%s\n' "  \"fileSizeBytes\": $iso_size_bytes,"
   printf '%s\n' "  \"builtAtUtc\": \"$iso_built_at\","
   printf '%s\n' '  "builder": "src/InstallerLinux/build/build-installer-image.sh",'
-  printf '%s\n' '  "notes": "Standalone bootable installer ISO. Intended for VMs or optical-style boot media; it does not include the writable HAOS-CACHE USB partition."'
+  printf '%s\n' '  "notes": "Standalone bootable installer ISO. Intended for VMs, Ventoy, or optical-style boot media; it does not include the writable HAOS-CACHE USB partition and normally downloads Home Assistant OS during install."'
   printf '%s\n' '}'
 } > "${iso_output}.manifest.json"
 
@@ -105,7 +105,7 @@ cat > /work/extract/boot/grub/grub.cfg <<GRUBCFG
 set timeout=3
 
 menuentry "HAOS AIO Installer USB" {
-linux /boot/vmlinuz-lts modules=loop,squashfs,sd-mod,usb-storage,uas,ahci,nvme,virtio_blk,virtio_pci,virtio_net,e1000,e1000e,igb,igc,ixgbe,i40e,ice,r8169,atlantic,alx,tg3,bnx2,bnx2x,qede,mlx4_en,mlx5_core,be2net,enic,sky2,skge,forcedeth,via-rhine,via-velocity,tulip,pcnet32,8139too,8139cp,sis900,natsemi,vmxnet3,r8152,asix,ax88179_178a,cdc_ether,smsc95xx,dm9601,mcs7830 alpine_dev=LABEL=$BOOT_LABEL console=tty1
+linux /boot/vmlinuz-lts modules=loop,squashfs,isofs,cdrom,sr_mod,sd-mod,usb-storage,uas,ahci,nvme,virtio_blk,virtio_scsi,virtio_pci,virtio_net,e1000,e1000e,igb,igc,ixgbe,i40e,ice,r8169,atlantic,alx,tg3,bnx2,bnx2x,qede,mlx4_en,mlx5_core,be2net,enic,sky2,skge,forcedeth,via-rhine,via-velocity,tulip,pcnet32,8139too,8139cp,sis900,natsemi,vmxnet3,r8152,asix,ax88179_178a,cdc_ether,smsc95xx,dm9601,mcs7830 alpine_dev=LABEL=$BOOT_LABEL console=tty1
 initrd /boot/initramfs-lts
 }
 GRUBCFG

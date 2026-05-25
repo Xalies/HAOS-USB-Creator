@@ -3,6 +3,7 @@ set -eu
 
 find_cache_partition() {
   if [ -n "${HAOS_CACHE_DIR:-}" ]; then
+    mkdir -p "$HAOS_CACHE_DIR" 2>/dev/null || true
     configure_usb_logging "$HAOS_CACHE_DIR" >/dev/null 2>&1 || true
     printf '%s\n' "$HAOS_CACHE_DIR"
     return 0
@@ -21,6 +22,20 @@ find_cache_partition() {
 
   log_warn "No mounted HAOS cache partition found."
   return 1
+}
+
+find_writable_image_cache() {
+  cache_dir="$(find_cache_partition 2>/dev/null || true)"
+  if [ -n "$cache_dir" ] && [ -d "$cache_dir" ] && [ -w "$cache_dir" ]; then
+    printf '%s\n' "$cache_dir"
+    return 0
+  fi
+
+  cache_dir="${HAOS_MEMORY_CACHE_DIR:-/tmp/haos-cache}"
+  mkdir -p "$cache_dir"
+  export HAOS_CACHE_DIR="$cache_dir"
+  log_warn "Using temporary memory-backed image cache at $cache_dir. This is expected when booted from the standalone ISO."
+  printf '%s\n' "$cache_dir"
 }
 
 initialize_cache_logging() {
