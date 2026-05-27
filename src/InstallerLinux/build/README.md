@@ -45,7 +45,7 @@ Standalone ISO output:
 - matching `.sha256`
 - matching `.manifest.json`
 
-The ISO boots the same Alpine installer environment, but it does not contain the writable `HAOS-CACHE` USB partition. It is intended for VMs, Ventoy disks, and optical-style boot media. It will normally download the Home Assistant OS generic x86-64 image into temporary memory-backed storage, verify it, and then write the verified image to the selected disk.
+The ISO boots the same Alpine installer environment, but it does not contain the writable `HAOS-CACHE` USB partition. It is intended for VMs, Ventoy disks, and optical-style boot media. It will normally download the Home Assistant OS generic x86-64 image into temporary memory-backed storage, verify it, and then write the verified image to the selected disk. Boot media discovery uses a short default wait; the raw USB boot menu also includes a slower compatibility entry for machines that need more time to enumerate the installer media.
 
 The raw image contains a GPT layout with:
 
