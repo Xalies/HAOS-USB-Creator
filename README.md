@@ -4,9 +4,7 @@ HAOS AIO USB Creator is an unofficial Windows tool for creating an all-in-one US
 
 It creates a bootable USB installer, downloads the official Home Assistant OS generic x86-64 image, stores that image on the USB for offline use, and boots into a small Linux installer that writes Home Assistant OS to the selected internal disk.
 
-This is not a normal Windows app installer. It is a disk imaging tool. It can erase drives.
-
-Copyright (C) 2026 Sonny Gilbert.
+Also the .iso is bootable and will work if you wish to keep it on a Ventroy drive, there will be a short hang as it expects the data partition normally on the created USB but will continue and doewnload the HA image to write to disk 
 
 ## Status
 
