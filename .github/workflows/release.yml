@@ -21,14 +21,6 @@ jobs:
       - name: Build boot image
         run: bash ./src/InstallerLinux/build/build-installer-image.sh ./artifacts/installer-linux
 
-      - name: Package boot image release zip
-        run: |
-          cd artifacts/installer-linux
-          zip -9 ../HAOS-USB-Creator-boot-image.zip \
-            haos-installer-x86_64.img \
-            haos-installer-x86_64.img.sha256 \
-            haos-installer-x86_64.img.manifest.json
-
       - name: Package standalone ISO release zip
         run: |
           cd artifacts/installer-linux
@@ -45,13 +37,6 @@ jobs:
             artifacts/installer-linux/haos-installer-x86_64.img
             artifacts/installer-linux/haos-installer-x86_64.img.sha256
             artifacts/installer-linux/haos-installer-x86_64.img.manifest.json
-          if-no-files-found: error
-
-      - name: Upload boot image release zip
-        uses: actions/upload-artifact@v4
-        with:
-          name: haos-usb-creator-boot-image-zip
-          path: artifacts/HAOS-USB-Creator-boot-image.zip
           if-no-files-found: error
 
       - name: Upload standalone ISO release zip
@@ -80,12 +65,6 @@ jobs:
         with:
           name: haos-usb-creator-boot-image
           path: src/WindowsApp/src/HAOSInstaller.App/Assets/BootImage
-
-      - name: Download boot image release zip
-        uses: actions/download-artifact@v4
-        with:
-          name: haos-usb-creator-boot-image-zip
-          path: publish
 
       - name: Download standalone ISO release zip
         uses: actions/download-artifact@v4
@@ -122,5 +101,4 @@ jobs:
         with:
           files: |
             publish/HAOS-USB-Creator-win-x64.zip
-            publish/HAOS-USB-Creator-boot-image.zip
             publish/HAOS-Installer-ISO.zip
