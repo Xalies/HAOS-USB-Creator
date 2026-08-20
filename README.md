@@ -1,12 +1,10 @@
 # HAOS AIO USB Creator
 
-<<<<<<< Updated upstream
 HAOS AIO USB Creator is an unofficial Windows tool for creating a bootable all-in-one installer USB for Home Assistant OS on a dedicated generic x86-64 PC.
 =======
 HAOS AIO USB Creator is an unofficial Windows tool for creating a bootable all-in-one installer USB for **Home Assistant OS on a dedicated generic x86-64 PC**.
 
 It is meant for dedicated x86-64 machines.
->>>>>>> Stashed changes
 
 ## What It Does
 
