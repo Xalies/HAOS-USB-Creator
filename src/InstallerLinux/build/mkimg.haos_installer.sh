@@ -42,6 +42,7 @@ profile_haos_installer() {
         pciutils
         usbutils
         openrc
+        openssh-server
         eudev
         kbd
         terminus-font

@@ -1,6 +1,6 @@
 # Boot Image Build
 
-This folder contains developer/release tooling for building the Alpine-based HAOS AIO Installer USB Linux environment.
+This folder contains developer/release tooling for building the Alpine-based HAOS AIO Installer USB Linux environment. The default build uses Alpine Linux 3.24 stable.
 
 The primary product output is a HAOS AIO raw USB image. The build also keeps the generated bootable ISO as a secondary release file for VM, Ventoy, and optical-style boot use.
 
@@ -49,8 +49,8 @@ The ISO boots the same Alpine installer environment, but it does not contain the
 
 The raw image contains a GPT layout with:
 
-- `HAOSINSTLR`: 896 MiB FAT32 EFI System Partition with the Alpine installer boot files and broad firmware/network support.
+- `HAOSINSTLR`: 1.5 GiB FAT32 EFI System Partition with the Alpine installer boot files and broad firmware/network support.
 - `HAOS-CACHE`: about 1.75 GiB FAT32 data partition with `cache/` and `logs/` folders. This partition is marked with the GPT no-default-drive-letter attribute so Windows should not open it in Explorer while the app is still copying files.
 
-The raw image is intentionally about 2.625 GiB: the boot partition is kept compact, while the cache partition stays large enough for the cached Home Assistant OS image and installer-side update downloads.
+The raw image is intentionally about 3.375 GiB: the boot partition has room for current Alpine firmware and SSH support, while the cache partition stays large enough for the cached Home Assistant OS image and installer-side update downloads.
 

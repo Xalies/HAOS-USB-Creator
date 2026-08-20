@@ -2,6 +2,7 @@ using System.IO;
 using System.Net.Http;
 using System.Windows;
 using System.Diagnostics;
+using System.Security.Cryptography;
 using System.Windows.Controls;
 using System.Windows.Media;
 using HAOSInstaller.Core.Models;
@@ -27,6 +28,7 @@ public partial class MainWindow : Window
     private HaosReleaseInfo? _latestRelease;
     private HaosInstallerBootImage? _bootImage;
     private HaosPayloadStageResult? _stagedPayload;
+    private string? _sshPassword;
 
     public MainWindow()
     {
@@ -165,6 +167,7 @@ public partial class MainWindow : Window
     private async void ConfirmWriteButton_Click(object sender, RoutedEventArgs e)
     {
         var unattendedInstall = UnattendedInstallCheckBox.IsChecked == true;
+        _sshPassword = SshAccessCheckBox.IsChecked == true ? GenerateTemporaryPassword() : null;
         GoToStep(InstallerStep.Write);
         PrepareProgressBar.Value = 0;
         BootWriteProgressBar.Value = 0;
@@ -220,19 +223,21 @@ public partial class MainWindow : Window
                     await ProvisionUsbCacheWithRetryAsync(
                         stagedPayload,
                         unattendedInstall,
+                        _sshPassword,
                         CancellationToken.None);
                 }
                 else
                 {
                     await WriteInstallerConfigWithRetryAsync(
                         unattendedInstall,
+                        _sshPassword,
                         CancellationToken.None);
 
                     ReportCopyPayloadProgress(new ImageWriteProgress(UiText.ProgressCopyUnavailable, 100));
                     AppendLog("No Home Assistant OS image is available on the USB. The booted installer will check if online.");
                 }
 
-                ConfigureFinishText(unattendedInstall, stagedPayload is not null);
+                ConfigureFinishText(unattendedInstall, stagedPayload is not null, _sshPassword);
                 GoToStep(InstallerStep.Finish);
             }
             finally
@@ -251,6 +256,7 @@ public partial class MainWindow : Window
     private async Task ProvisionUsbCacheWithRetryAsync(
         HaosPayloadStageResult stagedPayload,
         bool unattendedInstall,
+        string? sshPassword,
         CancellationToken cancellationToken)
     {
         await RetryUsbCacheAccessAsync(async cacheRoot =>
@@ -258,6 +264,7 @@ public partial class MainWindow : Window
             await _usbCacheProvisioningService.WriteInstallerConfigAsync(
                 cacheRoot,
                 unattendedInstall,
+                sshPassword,
                 cancellationToken);
 
             await _usbCacheProvisioningService.ProvisionAsync(
@@ -270,6 +277,7 @@ public partial class MainWindow : Window
 
     private async Task WriteInstallerConfigWithRetryAsync(
         bool unattendedInstall,
+        string? sshPassword,
         CancellationToken cancellationToken)
     {
         await RetryUsbCacheAccessAsync(async cacheRoot =>
@@ -277,6 +285,7 @@ public partial class MainWindow : Window
             await _usbCacheProvisioningService.WriteInstallerConfigAsync(
                 cacheRoot,
                 unattendedInstall,
+                sshPassword,
                 cancellationToken);
         }, cancellationToken);
     }
@@ -350,6 +359,8 @@ public partial class MainWindow : Window
         ConfirmEraseCheckBox.IsChecked = false;
         UnattendedInstallCheckBox.IsChecked = false;
         UnattendedWarningCheckBox.IsChecked = false;
+        SshAccessCheckBox.IsChecked = false;
+        _sshPassword = null;
         UnattendedWarningCheckBox.IsEnabled = false;
         ConfirmWriteButton.IsEnabled = false;
         PrepareProgressBar.Value = 0;
@@ -360,15 +371,25 @@ public partial class MainWindow : Window
         GoToStep(InstallerStep.Welcome);
     }
 
-    private void ConfigureFinishText(bool unattendedInstall, bool hasCachedPayload)
+    private void ConfigureFinishText(bool unattendedInstall, bool hasCachedPayload, string? sshPassword)
     {
         FinishSummaryText.Text = hasCachedPayload
             ? UiText.FinishSummaryWithPayload
             : UiText.FinishSummaryNoPayload;
 
-        FinishNextStepText.Text = unattendedInstall
+        var nextStepText = unattendedInstall
             ? UiText.FinishNextStepUnattended
             : UiText.FinishNextStepAttended;
+
+        FinishNextStepText.Text = string.IsNullOrWhiteSpace(sshPassword)
+            ? nextStepText
+            : nextStepText + Environment.NewLine + Environment.NewLine + string.Format(UiText.FinishSshAccessFormat, sshPassword);
+    }
+
+    private static string GenerateTemporaryPassword()
+    {
+        const string chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789";
+        return string.Concat(Enumerable.Range(0, 16).Select(_ => chars[RandomNumberGenerator.GetInt32(chars.Length)]));
     }
 
     private void BuyMeCoffeeImage_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)

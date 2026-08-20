@@ -17,6 +17,7 @@ public sealed class UsbCacheProvisioningService
     public async Task WriteInstallerConfigAsync(
         string usbCacheRoot,
         bool unattendedInstallEnabled,
+        string? sshPassword,
         CancellationToken cancellationToken)
     {
         var destinationCacheDirectory = Path.Combine(usbCacheRoot, "cache");
@@ -27,7 +28,10 @@ public sealed class UsbCacheProvisioningService
             Unattended: new UnattendedInstallConfig(
                 Enabled: unattendedInstallEnabled,
                 Mode: unattendedInstallEnabled ? "first-available-single-disk" : "disabled",
-                RunOnce: unattendedInstallEnabled));
+                RunOnce: unattendedInstallEnabled),
+            Ssh: new SshInstallConfig(
+                Enabled: !string.IsNullOrWhiteSpace(sshPassword),
+                Password: sshPassword ?? string.Empty));
 
         var configPath = Path.Combine(destinationCacheDirectory, "installer-config.json");
         await using var stream = new FileStream(configPath, FileMode.Create, FileAccess.Write, FileShare.Read, 16 * 1024, useAsync: true);
@@ -424,9 +428,14 @@ public sealed record UsbCacheProvisionResult(
 
 public sealed record InstallerConfig(
     int SchemaVersion,
-    UnattendedInstallConfig Unattended);
+    UnattendedInstallConfig Unattended,
+    SshInstallConfig Ssh);
 
 public sealed record UnattendedInstallConfig(
     bool Enabled,
     string Mode,
     bool RunOnce);
+
+public sealed record SshInstallConfig(
+    bool Enabled,
+    string Password);

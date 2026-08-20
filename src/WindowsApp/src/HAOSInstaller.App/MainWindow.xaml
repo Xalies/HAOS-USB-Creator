@@ -284,7 +284,8 @@
                                Text="{x:Static res:UiText.ConfirmSubheading}" />
                 </StackPanel>
 
-                <StackPanel Grid.Row="1">
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                <StackPanel>
                     <Border Style="{StaticResource CardStyle}" Margin="0,0,0,12">
                         <Grid>
                             <Grid.RowDefinitions>
@@ -356,7 +357,27 @@
                             </CheckBox>
                         </StackPanel>
                     </Border>
+
+                    <Border Background="White"
+                            BorderBrush="{StaticResource HABorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="16,12"
+                            Margin="0,12,0,0">
+                        <StackPanel>
+                            <CheckBox x:Name="SshAccessCheckBox">
+                                <TextBlock Style="{StaticResource BodyStyle}"
+                                           FontWeight="SemiBold"
+                                           Text="{x:Static res:UiText.SshAccessTitle}" />
+                            </CheckBox>
+                            <TextBlock Style="{StaticResource CaptionStyle}"
+                                       Margin="26,8,0,0"
+                                       TextWrapping="Wrap"
+                                       Text="{x:Static res:UiText.SshAccessWarning}" />
+                        </StackPanel>
+                    </Border>
                 </StackPanel>
+                </ScrollViewer>
 
                 <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
                     <Button Style="{StaticResource SecondaryButton}" Content="{x:Static res:UiText.ButtonBack}" Margin="0,0,12,0" Click="BackToDrive_Click" />

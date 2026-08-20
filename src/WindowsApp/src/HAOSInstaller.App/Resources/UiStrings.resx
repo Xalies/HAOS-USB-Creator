@@ -231,6 +231,12 @@
   <data name="UnattendedConfirmText" xml:space="preserve">
     <value>I understand the booted installer will automatically erase the detected internal target disk without asking me again.</value>
   </data>
+  <data name="SshAccessTitle" xml:space="preserve">
+    <value>Enable SSH access when the USB boots</value>
+  </data>
+  <data name="SshAccessWarning" xml:space="preserve">
+    <value>For headless installs. The booted installer will try DHCP, start SSH, and allow root login with a temporary password shown after this USB is created.</value>
+  </data>
   <data name="ButtonStartWrite" xml:space="preserve">
     <value>Start write</value>
   </data>
@@ -356,5 +362,8 @@
   </data>
   <data name="FinishNextStepUnattended" xml:space="preserve">
     <value>When the Linux installer starts, it will check the Home Assistant OS image on the USB, look online for a newer verified image, and use the newest valid option automatically. Because unattended mode is enabled, it will continue only when it finds one eligible internal disk, erase that disk, write Home Assistant OS, set up boot drive where possible and reboot when finished. Unattended setups are marked on install USB so install loops should have protection for clean installs.</value>
+  </data>
+  <data name="FinishSshAccessFormat" xml:space="preserve">
+    <value>SSH is enabled for the booted installer. Connect as root using this temporary password: {0}</value>
   </data>
 </root>

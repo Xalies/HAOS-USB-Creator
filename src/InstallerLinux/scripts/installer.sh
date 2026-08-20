@@ -9,6 +9,7 @@ SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 . "$SCRIPT_DIR/disk-detect.sh"
 . "$SCRIPT_DIR/haos-release.sh"
 . "$SCRIPT_DIR/image-cache.sh"
+. "$SCRIPT_DIR/ssh.sh"
 . "$SCRIPT_DIR/image-select.sh"
 . "$SCRIPT_DIR/target-select.sh"
 . "$SCRIPT_DIR/write-image.sh"
@@ -38,6 +39,12 @@ main() {
     log_warn "Boot image build info file is missing."
   fi
 
+  check_runtime_dependencies
+  check_uefi_mode || log_warn "Installer should continue only with explicit user acknowledgement in a later milestone."
+  check_secure_boot || true
+  initialize_cache_logging || log_warn "Could not enable persistent USB logging."
+  start_configured_ssh || log_warn "Configured SSH could not be started."
+
   if installer_unattended_enabled; then
     export HAOS_UNATTENDED=1
     log_warn "Unattended install mode is enabled by USB creator configuration."
@@ -48,11 +55,6 @@ main() {
       "HAOS AIO Installer USB" \
       "This installer will install Home Assistant OS onto a dedicated internal disk.\n\nIt will check for a downloaded image on this USB, look online for a newer image when possible, then ask you to choose the disk to erase."
   fi
-
-  check_runtime_dependencies
-  check_uefi_mode || log_warn "Installer should continue only with explicit user acknowledgement in a later milestone."
-  check_secure_boot || true
-  initialize_cache_logging || log_warn "Could not enable persistent USB logging."
 
   targets_json="${HAOS_TARGETS_JSON:-/tmp/haos-install-targets.json}"
   list_install_targets > "$targets_json"

@@ -54,6 +54,7 @@ public sealed class UsbCacheProvisioningServiceTests
             await new UsbCacheProvisioningService().WriteInstallerConfigAsync(
                 tempDirectory,
                 unattendedInstallEnabled: true,
+                sshPassword: "test-password",
                 CancellationToken.None);
 
             var configPath = Path.Combine(tempDirectory, "cache", "installer-config.json");
@@ -62,6 +63,8 @@ public sealed class UsbCacheProvisioningServiceTests
             Assert.Contains("\"enabled\": true", configJson);
             Assert.Contains("\"mode\": \"first-available-single-disk\"", configJson);
             Assert.Contains("\"runOnce\": true", configJson);
+            Assert.Contains("\"ssh\"", configJson);
+            Assert.Contains("\"password\": \"test-password\"", configJson);
         }
         finally
         {

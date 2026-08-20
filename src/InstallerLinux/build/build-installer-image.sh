@@ -5,9 +5,9 @@ OUTDIR="${1:-./artifacts/installer-linux}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 INSTALLER_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 IMAGE_NAME="haos-installer-image-builder"
-ALPINE_VERSION="${ALPINE_VERSION:-3.20}"
-ALPINE_BRANCH="${ALPINE_BRANCH:-3.20-stable}"
-IMAGE_SIZE_MIB="${IMAGE_SIZE_MIB:-2688}"
+ALPINE_VERSION="${ALPINE_VERSION:-3.24}"
+ALPINE_BRANCH="${ALPINE_BRANCH:-3.24-stable}"
+IMAGE_SIZE_MIB="${IMAGE_SIZE_MIB:-3456}"
 
 mkdir -p "$OUTDIR"
 OUTDIR_ABS="$(cd "$OUTDIR" && pwd)"
@@ -54,21 +54,21 @@ set -eu
 
 BOOT_LABEL="${BOOT_LABEL:-HAOSINSTLR}"
 CACHE_LABEL="${CACHE_LABEL:-HAOS-CACHE}"
-IMAGE_SIZE_MIB="${IMAGE_SIZE_MIB:-2688}"
+IMAGE_SIZE_MIB="${IMAGE_SIZE_MIB:-3456}"
 BOOT_START_SECTOR=2048
-BOOT_SECTORS=1835008
-CACHE_START_SECTOR=1839104
+BOOT_SECTORS=3145728
+CACHE_START_SECTOR=3149824
 CACHE_SECTORS=3665887
 
 mkdir -p /iso-out /work/extract
+chown -R builder:builder /iso-out /work /aports
 
-cd /aports/scripts
-sh mkimage.sh \
+su builder -c "cd /aports/scripts && sh mkimage.sh \
   --profile haos_installer \
   --outdir /iso-out \
   --arch x86_64 \
   --repository "https://dl-cdn.alpinelinux.org/alpine/v${ALPINE_VERSION}/main" \
-  --repository "https://dl-cdn.alpinelinux.org/alpine/v${ALPINE_VERSION}/community"
+  --repository "https://dl-cdn.alpinelinux.org/alpine/v${ALPINE_VERSION}/community""
 
 iso_path="$(find /iso-out -maxdepth 1 -name '*.iso' | head -n 1)"
 if [ -z "$iso_path" ]; then
@@ -140,8 +140,8 @@ mcopy -i "$boot_fat" -s /work/extract/* ::
 mformat -i "$cache_fat" -F -v "$CACHE_LABEL" ::
 mmd -i "$cache_fat" ::/cache ::/logs
 
-dd if="$boot_fat" of="$image_path" bs=512 seek="$BOOT_START_SECTOR" conv=notrunc status=none
-dd if="$cache_fat" of="$image_path" bs=512 seek="$CACHE_START_SECTOR" conv=notrunc status=none
+dd if="$boot_fat" of="$image_path" bs=4M seek="$((BOOT_START_SECTOR * 512))" oflag=seek_bytes conv=notrunc status=none
+dd if="$cache_fat" of="$image_path" bs=4M seek="$((CACHE_START_SECTOR * 512))" oflag=seek_bytes conv=notrunc status=none
 
 sha256sum "$image_path" > "${image_path}.sha256"
 
@@ -206,7 +206,12 @@ RUN chmod +x /usr/local/bin/build-usb-image \\
  && chmod +x /haos-overlay/usr/local/bin/haos-installer-autostart \\
  && chmod +x /haos-overlay/usr/local/bin/haos-installer/*.sh
 
-RUN SUDO= sudo abuild-keygen -a -i -n
+RUN adduser -D builder \
+ && addgroup builder abuild \
+ && printf '%s\n' 'builder ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/builder \
+ && chmod 0440 /etc/sudoers.d/builder \
+ && chown -R builder:builder /aports \
+ && su builder -c 'SUDO=sudo abuild-keygen -a -i -n'
 
 RUN cat > /aports/scripts/haos-installer.apkovl.sh <<'APKOVL' && \\
     chmod +x /aports/scripts/haos-installer.apkovl.sh
@@ -224,6 +229,7 @@ docker build --tag "$IMAGE_NAME:latest" --progress=plain "$tmpdir"
 
 echo "[2/2] Building raw USB image..."
 docker run --rm \
+  --tmpfs /work:rw,size=5g \
   -v "${OUTDIR_ABS}:/out" \
   -e IMAGE_SIZE_MIB="$IMAGE_SIZE_MIB" \
   "$IMAGE_NAME:latest"

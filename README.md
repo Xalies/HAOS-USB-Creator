@@ -1,6 +1,12 @@
 # HAOS AIO USB Creator
 
+<<<<<<< Updated upstream
 HAOS AIO USB Creator is an unofficial Windows tool for creating a bootable all-in-one installer USB for Home Assistant OS on a dedicated generic x86-64 PC.
+=======
+HAOS AIO USB Creator is an unofficial Windows tool for creating a bootable all-in-one installer USB for **Home Assistant OS on a dedicated generic x86-64 PC**.
+
+It is meant for dedicated x86-64 machines.
+>>>>>>> Stashed changes
 
 ## What It Does
 
@@ -70,9 +76,21 @@ or by using the IP address shown by your router.
 
 The normal install mode asks you to choose the target disk and confirm before erasing it.
 
-The unattended option is intended for headless or appliance-style installs. It should only be used when the target PC has only one internal install disk. If multiple eligible disks are found, unattended install will stop... this is intended as to safegard against data loss.
+The unattended option is intended for headless or appliance-style installs. It should only be used when the target PC has only one internal install disk. If multiple eligible disks are found, unattended install will stop instead of guessing.
 
 Do not use unattended mode on a machine with multiple internal drives.
+
+## Optional SSH Access
+
+The USB creator can enable SSH access in the booted installer.
+
+Use this if the target PC is headless and unattended mode does not suit the install. The app generates a temporary password and shows it when the USB is ready. After booting the USB, connect as:
+
+```text
+root
+```
+
+SSH still needs working network hardware and DHCP. If the installer cannot bring up the network interface, SSH will not be reachable.
 
 ## Unofficial Project
 
