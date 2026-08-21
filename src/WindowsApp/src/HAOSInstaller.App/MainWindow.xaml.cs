@@ -2,7 +2,6 @@ using System.IO;
 using System.Net.Http;
 using System.Windows;
 using System.Diagnostics;
-using System.Security.Cryptography;
 using System.Windows.Controls;
 using System.Windows.Media;
 using HAOSInstaller.Core.Models;
@@ -157,17 +156,34 @@ public partial class MainWindow : Window
         UpdateConfirmWriteButtonState();
     }
 
+    private void SshAccessCheckBox_Changed(object sender, RoutedEventArgs e)
+    {
+        if (SshPasswordBox is not null)
+        {
+            SshPasswordBox.IsEnabled = SshAccessCheckBox.IsChecked == true;
+            if (SshAccessCheckBox.IsChecked != true)
+            {
+                SshPasswordBox.Password = string.Empty;
+            }
+        }
+
+        UpdateConfirmWriteButtonState();
+    }
+
+    private void SshPasswordBox_PasswordChanged(object sender, RoutedEventArgs e) => UpdateConfirmWriteButtonState();
+
     private void UpdateConfirmWriteButtonState()
     {
         var usbEraseConfirmed = ConfirmEraseCheckBox.IsChecked == true;
         var unattendedConfirmed = UnattendedInstallCheckBox.IsChecked != true || UnattendedWarningCheckBox.IsChecked == true;
-        ConfirmWriteButton.IsEnabled = usbEraseConfirmed && unattendedConfirmed;
+        var sshPasswordReady = SshAccessCheckBox.IsChecked != true || SshPasswordBox.Password.Length >= 8;
+        ConfirmWriteButton.IsEnabled = usbEraseConfirmed && unattendedConfirmed && sshPasswordReady;
     }
 
     private async void ConfirmWriteButton_Click(object sender, RoutedEventArgs e)
     {
         var unattendedInstall = UnattendedInstallCheckBox.IsChecked == true;
-        _sshPassword = SshAccessCheckBox.IsChecked == true ? GenerateTemporaryPassword() : null;
+        _sshPassword = SshAccessCheckBox.IsChecked == true ? SshPasswordBox.Password : null;
         GoToStep(InstallerStep.Write);
         PrepareProgressBar.Value = 0;
         BootWriteProgressBar.Value = 0;
@@ -360,6 +376,8 @@ public partial class MainWindow : Window
         UnattendedInstallCheckBox.IsChecked = false;
         UnattendedWarningCheckBox.IsChecked = false;
         SshAccessCheckBox.IsChecked = false;
+        SshPasswordBox.Password = string.Empty;
+        SshPasswordBox.IsEnabled = false;
         _sshPassword = null;
         UnattendedWarningCheckBox.IsEnabled = false;
         ConfirmWriteButton.IsEnabled = false;
@@ -384,12 +402,6 @@ public partial class MainWindow : Window
         FinishNextStepText.Text = string.IsNullOrWhiteSpace(sshPassword)
             ? nextStepText
             : nextStepText + Environment.NewLine + Environment.NewLine + string.Format(UiText.FinishSshAccessFormat, sshPassword);
-    }
-
-    private static string GenerateTemporaryPassword()
-    {
-        const string chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789";
-        return string.Concat(Enumerable.Range(0, 16).Select(_ => chars[RandomNumberGenerator.GetInt32(chars.Length)]));
     }
 
     private void BuyMeCoffeeImage_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)

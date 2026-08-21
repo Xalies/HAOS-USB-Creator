@@ -235,7 +235,10 @@
     <value>Enable SSH access when the USB boots</value>
   </data>
   <data name="SshAccessWarning" xml:space="preserve">
-    <value>For headless installs. The booted installer will try DHCP, start SSH, and allow root login with a temporary password shown after this USB is created.</value>
+    <value>For headless installs. The booted installer will try DHCP, start SSH, and allow root login with the password you choose here. The password is stored on this USB.</value>
+  </data>
+  <data name="SshPasswordLabel" xml:space="preserve">
+    <value>SSH password (at least 8 characters)</value>
   </data>
   <data name="ButtonStartWrite" xml:space="preserve">
     <value>Start write</value>
@@ -364,6 +367,6 @@
     <value>When the Linux installer starts, it will check the Home Assistant OS image on the USB, look online for a newer verified image, and use the newest valid option automatically. Because unattended mode is enabled, it will continue only when it finds one eligible internal disk, erase that disk, write Home Assistant OS, set up boot drive where possible and reboot when finished. Unattended setups are marked on install USB so install loops should have protection for clean installs.</value>
   </data>
   <data name="FinishSshAccessFormat" xml:space="preserve">
-    <value>SSH is enabled for the booted installer. Connect as root using this temporary password: {0}</value>
+    <value>SSH is enabled for the booted installer. Connect as root using the SSH password you set: {0}</value>
   </data>
 </root>

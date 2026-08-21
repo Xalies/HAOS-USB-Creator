@@ -47,6 +47,7 @@ public static class UiText
     public static string UnattendedConfirmText => Get();
     public static string SshAccessTitle => Get();
     public static string SshAccessWarning => Get();
+    public static string SshPasswordLabel => Get();
     public static string ButtonStartWrite => Get();
     public static string WriteHeading => Get();
     public static string WriteSubheading => Get();

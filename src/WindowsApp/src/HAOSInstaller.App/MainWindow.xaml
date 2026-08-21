@@ -365,7 +365,9 @@
                             Padding="16,12"
                             Margin="0,12,0,0">
                         <StackPanel>
-                            <CheckBox x:Name="SshAccessCheckBox">
+                            <CheckBox x:Name="SshAccessCheckBox"
+                                      Checked="SshAccessCheckBox_Changed"
+                                      Unchecked="SshAccessCheckBox_Changed">
                                 <TextBlock Style="{StaticResource BodyStyle}"
                                            FontWeight="SemiBold"
                                            Text="{x:Static res:UiText.SshAccessTitle}" />
@@ -374,6 +376,14 @@
                                        Margin="26,8,0,0"
                                        TextWrapping="Wrap"
                                        Text="{x:Static res:UiText.SshAccessWarning}" />
+                            <TextBlock Style="{StaticResource CaptionStyle}"
+                                       Margin="26,10,0,4"
+                                       Text="{x:Static res:UiText.SshPasswordLabel}" />
+                            <PasswordBox x:Name="SshPasswordBox"
+                                         Margin="26,0,0,0"
+                                         Height="30"
+                                         IsEnabled="False"
+                                         PasswordChanged="SshPasswordBox_PasswordChanged" />
                         </StackPanel>
                     </Border>
                 </StackPanel>
