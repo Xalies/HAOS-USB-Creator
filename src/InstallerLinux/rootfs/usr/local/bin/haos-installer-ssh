@@ -4,6 +4,10 @@ set +e
 export TERM="${TERM:-xterm}"
 
 if command -v tmux >/dev/null 2>&1; then
+  if tmux has-session -t haos-installer 2>/dev/null; then
+    tmux set-window-option -t haos-installer:0 window-size latest >/dev/null 2>&1 || true
+    exec tmux attach-session -d -t haos-installer
+  fi
   exec /usr/local/bin/haos-installer-session
 fi
 
