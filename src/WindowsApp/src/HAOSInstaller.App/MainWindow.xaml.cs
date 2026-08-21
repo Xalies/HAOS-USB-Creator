@@ -144,10 +144,16 @@ public partial class MainWindow : Window
 
     private void UnattendedInstallCheckBox_Changed(object sender, RoutedEventArgs e)
     {
+        var enabled = UnattendedInstallCheckBox.IsChecked == true;
+        if (UnattendedDetailsPanel is not null)
+        {
+            UnattendedDetailsPanel.Visibility = enabled ? Visibility.Visible : Visibility.Collapsed;
+        }
+
         if (UnattendedWarningCheckBox is not null)
         {
-            UnattendedWarningCheckBox.IsEnabled = UnattendedInstallCheckBox.IsChecked == true;
-            if (UnattendedInstallCheckBox.IsChecked != true)
+            UnattendedWarningCheckBox.IsEnabled = enabled;
+            if (!enabled)
             {
                 UnattendedWarningCheckBox.IsChecked = false;
             }
@@ -158,10 +164,16 @@ public partial class MainWindow : Window
 
     private void SshAccessCheckBox_Changed(object sender, RoutedEventArgs e)
     {
+        var enabled = SshAccessCheckBox.IsChecked == true;
+        if (SshDetailsPanel is not null)
+        {
+            SshDetailsPanel.Visibility = enabled ? Visibility.Visible : Visibility.Collapsed;
+        }
+
         if (SshPasswordBox is not null)
         {
-            SshPasswordBox.IsEnabled = SshAccessCheckBox.IsChecked == true;
-            if (SshAccessCheckBox.IsChecked != true)
+            SshPasswordBox.IsEnabled = enabled;
+            if (!enabled)
             {
                 SshPasswordBox.Password = string.Empty;
             }

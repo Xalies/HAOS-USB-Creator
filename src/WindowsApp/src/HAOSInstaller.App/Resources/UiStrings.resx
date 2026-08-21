@@ -232,7 +232,7 @@
     <value>I understand the booted installer will automatically erase the detected internal target disk without asking me again.</value>
   </data>
   <data name="SshAccessTitle" xml:space="preserve">
-    <value>Enable SSH access when the USB boots</value>
+    <value>Enable installer SSH access.</value>
   </data>
   <data name="SshAccessWarning" xml:space="preserve">
     <value>For headless installs. The booted installer will try DHCP, start SSH, and allow root login with the password you choose here. The password is stored on this USB.</value>

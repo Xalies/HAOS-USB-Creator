@@ -24,8 +24,10 @@ select_install_image() {
   if cached_image="$(verify_cached_image 2>/tmp/haos-cache-verify.err)"; then
     cached_version="$(cached_image_version_for_path "$cached_image")"
     log_info "Verified cached HAOS payload version: $cached_version"
+    tui_status "Home Assistant OS Image" "Downloaded Home Assistant OS $cached_version was found on the USB.\n\nChecking online for a newer Generic x86-64 image."
   else
     log_warn "Cached HAOS payload is not available or not valid."
+    tui_status "Home Assistant OS Image" "No downloaded Home Assistant OS image was found on the USB.\n\nChecking online for the latest Generic x86-64 image."
   fi
 
   tui_status "Network Check" "Checking internet access."
@@ -78,12 +80,15 @@ select_install_image() {
         fi
       else
         log_info "Cached HAOS payload version $cached_version is current; using cache."
+        tui_status "Home Assistant OS Image" "Downloaded Home Assistant OS $cached_version is already current.\n\nUsing the image on this USB."
       fi
     else
       log_warn "Online HAOS release lookup failed."
+      tui_status "Network Check" "Could not check the latest Home Assistant OS release.\n\nUsing the downloaded image on this USB if it is valid."
     fi
   else
     log_warn "Network unavailable; using cached image if possible."
+    tui_status "Network Check" "No internet connection detected.\n\nUsing the downloaded image on this USB if it is valid."
   fi
 
   if [ -n "$cached_image" ]; then

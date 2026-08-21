@@ -1,0 +1,10 @@
+#!/bin/sh
+set +e
+
+export TERM="${TERM:-xterm}"
+
+if command -v tmux >/dev/null 2>&1; then
+  exec /usr/local/bin/haos-installer-session
+fi
+
+exec /usr/local/bin/haos-installer-run

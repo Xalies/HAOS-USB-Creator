@@ -4,6 +4,7 @@ set -eu
 HAOS_RELEASE_API="${HAOS_RELEASE_API:-https://api.github.com/repos/home-assistant/operating-system/releases/latest}"
 HAOS_ONLINE_DIR="${HAOS_ONLINE_DIR:-/tmp/haos-online}"
 NETWORK_MODULES="
+  af_packet
   e1000 e1000e igb igc ixgbe i40e ice
   r8169 atlantic alx tg3 bnx2 bnx2x qede
   mlx4_en mlx5_core be2net enic

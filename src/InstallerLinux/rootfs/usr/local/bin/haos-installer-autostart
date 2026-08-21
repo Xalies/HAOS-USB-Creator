@@ -9,7 +9,22 @@ printf '%s\n' 'Console: /dev/tty1'
 printf '%s\n' 'Debug shell: Alt+F2'
 printf '\n'
 
-/usr/local/bin/haos-installer-run
+use_ssh_session=0
+cache_device="$(blkid -L HAOS-CACHE 2>/dev/null || true)"
+if [ -n "$cache_device" ]; then
+  mkdir -p /mnt/haos-cache 2>/dev/null || true
+  mountpoint -q /mnt/haos-cache 2>/dev/null || mount -o rw "$cache_device" /mnt/haos-cache 2>/dev/null || true
+  config="/mnt/haos-cache/cache/installer-config.json"
+  if [ -f "$config" ] && command -v jq >/dev/null 2>&1; then
+    jq -e '.ssh.enabled == true and (.ssh.password // "" | length > 0)' "$config" >/dev/null 2>&1 && use_ssh_session=1
+  fi
+fi
+
+if [ "$use_ssh_session" = "1" ]; then
+  /usr/local/bin/haos-installer-session
+else
+  /usr/local/bin/haos-installer-run
+fi
 status=$?
 
 printf '\n'

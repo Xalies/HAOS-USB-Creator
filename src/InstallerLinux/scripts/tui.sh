@@ -24,13 +24,8 @@ tui_status() {
   title="$1"
   message="$2"
 
-  if tui_has_whiptail; then
-    whiptail --title "$title" --infobox "$message" 8 74 >/dev/tty 2>&1 || true
-    sleep 1
-    return 0
-  fi
-
-  printf '%s\n' "$message" >/dev/tty 2>/dev/null || printf '%s\n' "$message" >&2
+  printf '\n[%s] %s\n' "$title" "$(printf '%s' "$message" | tr '\n' ' ')" >/dev/tty 2>/dev/null \
+    || printf '[%s] %s\n' "$title" "$(printf '%s' "$message" | tr '\n' ' ')" >&2
 }
 
 tui_confirm() {

@@ -19,6 +19,8 @@ efivar
 pciutils
 usbutils
 openrc
+openssh-server
+tmux
 eudev
 kbd
 terminus-font

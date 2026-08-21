@@ -46,6 +46,8 @@ exec /usr/local/bin/haos-installer/installer.sh "$@"
 RUNNER
 
 chmod +x "$tmpdir/rootfs/usr/local/bin/haos-installer-run"
+chmod +x "$tmpdir/rootfs/usr/local/bin/haos-installer-session"
+chmod +x "$tmpdir/rootfs/usr/local/bin/haos-installer-ssh"
 chmod +x "$tmpdir/rootfs/usr/local/bin/haos-installer/"*.sh
 
 cat > "$tmpdir/build-usb-image.sh" <<'BUILDER'
@@ -65,6 +67,7 @@ chown -R builder:builder /iso-out /work /aports
 
 su builder -c "cd /aports/scripts && sh mkimage.sh \
   --profile haos_installer \
+  --hostkeys \
   --outdir /iso-out \
   --arch x86_64 \
   --repository "https://dl-cdn.alpinelinux.org/alpine/v${ALPINE_VERSION}/main" \
@@ -100,17 +103,53 @@ iso_built_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
 
 xorriso -osirrox on -indev "$iso_path" -extract / /work/extract >/dev/null
 touch /work/extract/.boot_repository
+find /work/extract -type f \( -name '*.cfg' -o -name '*.conf' \) \
+  -exec sed -i "s/HAOS-INSTLR/$BOOT_LABEL/g" {} +
+mkdir -p /work/initramfs
+(
+  cd /work/initramfs
+  zcat /work/extract/boot/initramfs-lts | cpio -idmu >/dev/null 2>&1
+  sed -i '/# Setup network interfaces/i\
+haos_write_boot_debug() {\
+\tlocal stage="$1" log="$ROOT"/tmp/haos-boot-debug.log dir=\
+\t{\
+\t\techo "===== HAOS boot debug: $stage ====="\
+\t\tdate 2>/dev/null || true\
+\t\techo "--- /proc/cmdline"; cat "$ROOT"/proc/cmdline 2>/dev/null || true\
+\t\techo "--- /proc/mounts"; cat "$ROOT"/proc/mounts 2>/dev/null || true\
+\t\techo "--- /tmp/apkovls"; cat "$ROOT"/tmp/apkovls 2>/dev/null || true\
+\t\techo "--- apk repositories"; cat "$repofile" 2>/dev/null || true\
+\t\techo "--- media files"; find "$ROOT"/media -maxdepth 3 -print 2>/dev/null || true\
+\t\techo "--- block devices"; blkid 2>/dev/null || true\
+\t\techo\
+\t} >> "$log"\
+\tfor dir in "$ROOT"/media/*; do\
+\t\t[ -d "$dir" ] || continue\
+\t\tcp "$log" "$dir"/haos-boot-debug.log 2>/dev/null || true\
+\tdone\
+\tsync 2>/dev/null || true\
+}\
+\
+haos_write_boot_debug "after-boot-media-mount"\
+# HAOS: FAT USB boot media can mount correctly while Alpine misses the sibling apkovl.\
+if ! [ -s "$ROOT"/tmp/apkovls ]; then\
+\tfind "$ROOT"/media/* -maxdepth 1 -name "*.apkovl.tar.gz" -type f > "$ROOT"/tmp/apkovls 2>/dev/null || true\
+fi\
+haos_write_boot_debug "after-haos-apkovl-scan"\
+' init
+  find . | cpio -o -H newc 2>/dev/null | gzip -9 > /work/extract/boot/initramfs-lts
+)
 
 cat > /work/extract/boot/grub/grub.cfg <<GRUBCFG
 set timeout=3
 
 menuentry "HAOS AIO Installer USB" {
-linux /boot/vmlinuz-lts modules=loop,squashfs,isofs,cdrom,sr_mod,sd-mod,usb-storage,uas,ahci,nvme,virtio_blk,virtio_scsi,virtio_pci,virtio_net,e1000,e1000e,igb,igc,ixgbe,i40e,ice,r8169,atlantic,alx,tg3,bnx2,bnx2x,qede,mlx4_en,mlx5_core,be2net,enic,sky2,skge,forcedeth,via-rhine,via-velocity,tulip,pcnet32,8139too,8139cp,sis900,natsemi,vmxnet3,r8152,asix,ax88179_178a,cdc_ether,smsc95xx,dm9601,mcs7830 alpine_dev=LABEL=$BOOT_LABEL usbdelay=3 console=tty1
+linux /boot/vmlinuz-lts modules=loop,squashfs,isofs,cdrom,sr_mod,sd-mod,usb-storage,uas,ahci,nvme,virtio_blk,virtio_scsi,virtio_pci,virtio_net,af_packet,e1000,e1000e,igb,igc,ixgbe,i40e,ice,r8169,atlantic,alx,tg3,bnx2,bnx2x,qede,mlx4_en,mlx5_core,be2net,enic,sky2,skge,forcedeth,via-rhine,via-velocity,tulip,pcnet32,8139too,8139cp,sis900,natsemi,vmxnet3,r8152,asix,ax88179_178a,cdc_ether,smsc95xx,dm9601,mcs7830 alpine_dev=LABEL=$BOOT_LABEL usbdelay=3 console=tty1
 initrd /boot/initramfs-lts
 }
 
 menuentry "HAOS AIO Installer USB (slow media compatibility)" {
-linux /boot/vmlinuz-lts modules=loop,squashfs,isofs,cdrom,sr_mod,sd-mod,usb-storage,uas,ahci,nvme,virtio_blk,virtio_scsi,virtio_pci,virtio_net,e1000,e1000e,igb,igc,ixgbe,i40e,ice,r8169,atlantic,alx,tg3,bnx2,bnx2x,qede,mlx4_en,mlx5_core,be2net,enic,sky2,skge,forcedeth,via-rhine,via-velocity,tulip,pcnet32,8139too,8139cp,sis900,natsemi,vmxnet3,r8152,asix,ax88179_178a,cdc_ether,smsc95xx,dm9601,mcs7830 alpine_dev=LABEL=$BOOT_LABEL usbdelay=10 console=tty1
+linux /boot/vmlinuz-lts modules=loop,squashfs,isofs,cdrom,sr_mod,sd-mod,usb-storage,uas,ahci,nvme,virtio_blk,virtio_scsi,virtio_pci,virtio_net,af_packet,e1000,e1000e,igb,igc,ixgbe,i40e,ice,r8169,atlantic,alx,tg3,bnx2,bnx2x,qede,mlx4_en,mlx5_core,be2net,enic,sky2,skge,forcedeth,via-rhine,via-velocity,tulip,pcnet32,8139too,8139cp,sis900,natsemi,vmxnet3,r8152,asix,ax88179_178a,cdc_ether,smsc95xx,dm9601,mcs7830 alpine_dev=LABEL=$BOOT_LABEL usbdelay=10 console=tty1
 initrd /boot/initramfs-lts
 }
 GRUBCFG
@@ -203,6 +242,8 @@ COPY build-usb-image.sh /usr/local/bin/build-usb-image
 
 RUN chmod +x /usr/local/bin/build-usb-image \\
  && chmod +x /haos-overlay/usr/local/bin/haos-installer-run \\
+ && chmod +x /haos-overlay/usr/local/bin/haos-installer-session \\
+ && chmod +x /haos-overlay/usr/local/bin/haos-installer-ssh \\
  && chmod +x /haos-overlay/usr/local/bin/haos-installer-autostart \\
  && chmod +x /haos-overlay/usr/local/bin/haos-installer/*.sh
 

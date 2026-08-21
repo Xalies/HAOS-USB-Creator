@@ -327,43 +327,12 @@
                         </CheckBox>
                     </Border>
 
-                    <Border Background="#FEF2F2"
-                            BorderBrush="{StaticResource HADangerBrush}"
-                            BorderThickness="1"
-                            CornerRadius="8"
-                            Padding="16,12"
-                            Margin="0,18,0,0">
-                        <StackPanel>
-                            <CheckBox x:Name="UnattendedInstallCheckBox"
-                                      Checked="UnattendedInstallCheckBox_Changed"
-                                      Unchecked="UnattendedInstallCheckBox_Changed">
-                                <TextBlock Style="{StaticResource BodyStyle}"
-                                           FontWeight="SemiBold"
-                                           Text="{x:Static res:UiText.UnattendedTitle}" />
-                            </CheckBox>
-                            <TextBlock Style="{StaticResource CaptionStyle}"
-                                       Margin="26,8,0,0"
-                                       Foreground="{StaticResource HADangerBrush}"
-                                       TextWrapping="Wrap"
-                                       Text="{x:Static res:UiText.UnattendedWarning}" />
-                            <CheckBox x:Name="UnattendedWarningCheckBox"
-                                      Margin="26,12,0,0"
-                                      IsEnabled="False"
-                                      Checked="UnattendedInstallCheckBox_Changed"
-                                      Unchecked="UnattendedInstallCheckBox_Changed">
-                                <TextBlock Style="{StaticResource BodyStyle}"
-                                           TextWrapping="Wrap"
-                                           Text="{x:Static res:UiText.UnattendedConfirmText}" />
-                            </CheckBox>
-                        </StackPanel>
-                    </Border>
-
                     <Border Background="White"
                             BorderBrush="{StaticResource HABorderBrush}"
                             BorderThickness="1"
                             CornerRadius="8"
                             Padding="16,12"
-                            Margin="0,12,0,0">
+                            Margin="0,18,0,0">
                         <StackPanel>
                             <CheckBox x:Name="SshAccessCheckBox"
                                       Checked="SshAccessCheckBox_Changed"
@@ -372,18 +341,55 @@
                                            FontWeight="SemiBold"
                                            Text="{x:Static res:UiText.SshAccessTitle}" />
                             </CheckBox>
-                            <TextBlock Style="{StaticResource CaptionStyle}"
-                                       Margin="26,8,0,0"
-                                       TextWrapping="Wrap"
-                                       Text="{x:Static res:UiText.SshAccessWarning}" />
-                            <TextBlock Style="{StaticResource CaptionStyle}"
-                                       Margin="26,10,0,4"
-                                       Text="{x:Static res:UiText.SshPasswordLabel}" />
-                            <PasswordBox x:Name="SshPasswordBox"
-                                         Margin="26,0,0,0"
-                                         Height="30"
-                                         IsEnabled="False"
-                                         PasswordChanged="SshPasswordBox_PasswordChanged" />
+                            <StackPanel x:Name="SshDetailsPanel"
+                                        Visibility="Collapsed">
+                                <TextBlock Style="{StaticResource CaptionStyle}"
+                                           Margin="26,8,0,0"
+                                           TextWrapping="Wrap"
+                                           Text="{x:Static res:UiText.SshAccessWarning}" />
+                                <TextBlock Style="{StaticResource CaptionStyle}"
+                                           Margin="26,10,0,4"
+                                           Text="{x:Static res:UiText.SshPasswordLabel}" />
+                                <PasswordBox x:Name="SshPasswordBox"
+                                             Margin="26,0,0,0"
+                                             Height="30"
+                                             IsEnabled="False"
+                                             PasswordChanged="SshPasswordBox_PasswordChanged" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Background="#FEF2F2"
+                            BorderBrush="{StaticResource HADangerBrush}"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="16,12"
+                            Margin="0,12,0,0">
+                        <StackPanel>
+                            <CheckBox x:Name="UnattendedInstallCheckBox"
+                                      Checked="UnattendedInstallCheckBox_Changed"
+                                      Unchecked="UnattendedInstallCheckBox_Changed">
+                                <TextBlock Style="{StaticResource BodyStyle}"
+                                           FontWeight="SemiBold"
+                                           Text="{x:Static res:UiText.UnattendedTitle}" />
+                            </CheckBox>
+                            <StackPanel x:Name="UnattendedDetailsPanel"
+                                        Visibility="Collapsed">
+                                <TextBlock Style="{StaticResource CaptionStyle}"
+                                           Margin="26,8,0,0"
+                                           Foreground="{StaticResource HADangerBrush}"
+                                           TextWrapping="Wrap"
+                                           Text="{x:Static res:UiText.UnattendedWarning}" />
+                                <CheckBox x:Name="UnattendedWarningCheckBox"
+                                          Margin="26,12,0,0"
+                                          IsEnabled="False"
+                                          Checked="UnattendedInstallCheckBox_Changed"
+                                          Unchecked="UnattendedInstallCheckBox_Changed">
+                                    <TextBlock Style="{StaticResource BodyStyle}"
+                                               TextWrapping="Wrap"
+                                               Text="{x:Static res:UiText.UnattendedConfirmText}" />
+                                </CheckBox>
+                            </StackPanel>
                         </StackPanel>
                     </Border>
                 </StackPanel>
