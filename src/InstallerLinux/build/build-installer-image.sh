@@ -224,7 +224,6 @@ RUN apk add --no-cache \\
     grub-efi \\
     mtools \\
     dosfstools \\
-    git \\
     curl \\
     xz \\
     syslinux \\
@@ -238,8 +237,19 @@ ARG ALPINE_BRANCH=${ALPINE_BRANCH}
 ARG ALPINE_VERSION=${ALPINE_VERSION}
 ENV ALPINE_VERSION=\${ALPINE_VERSION}
 
-RUN git clone --depth 1 --branch \${ALPINE_BRANCH} \\
-    https://gitlab.alpinelinux.org/alpine/aports.git /aports
+RUN set -eux; \\
+    branch="\${ALPINE_BRANCH}"; \\
+    for url in \\
+      "https://github.com/alpinelinux/aports/archive/refs/heads/\${branch}.tar.gz" \\
+      "https://gitlab.alpinelinux.org/alpine/aports/-/archive/\${branch}/aports-\${branch}.tar.gz"; do \\
+      if curl -fL "\${url}" -o /tmp/aports.tar.gz; then \\
+        mkdir -p /aports; \\
+        tar -xzf /tmp/aports.tar.gz -C /aports --strip-components=1; \\
+        rm /tmp/aports.tar.gz; \\
+        break; \\
+      fi; \\
+    done; \\
+    test -f /aports/scripts/mkimage.sh
 
 COPY rootfs/ /haos-overlay/
 COPY mkimage-profile/mkimg.haos_installer.sh /aports/scripts/mkimg.haos_installer.sh
