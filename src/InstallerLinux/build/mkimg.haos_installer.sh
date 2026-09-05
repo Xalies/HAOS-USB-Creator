@@ -30,12 +30,15 @@ profile_haos_installer() {
         linux-firmware
         jq
         xz
+        lsblk
         util-linux
         util-linux-misc
         parted
         e2fsprogs
         dosfstools
         gptfdisk
+        sgdisk
+        grub-bios
         pv
         efibootmgr
         efivar

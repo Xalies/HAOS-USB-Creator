@@ -327,37 +327,69 @@
                         </CheckBox>
                     </Border>
 
-                    <Border Background="White"
-                            BorderBrush="{StaticResource HABorderBrush}"
-                            BorderThickness="1"
-                            CornerRadius="8"
-                            Padding="16,12"
-                            Margin="0,18,0,0">
-                        <StackPanel>
-                            <CheckBox x:Name="SshAccessCheckBox"
-                                      Checked="SshAccessCheckBox_Changed"
-                                      Unchecked="SshAccessCheckBox_Changed">
-                                <TextBlock Style="{StaticResource BodyStyle}"
-                                           FontWeight="SemiBold"
-                                           Text="{x:Static res:UiText.SshAccessTitle}" />
-                            </CheckBox>
-                            <StackPanel x:Name="SshDetailsPanel"
-                                        Visibility="Collapsed">
-                                <TextBlock Style="{StaticResource CaptionStyle}"
-                                           Margin="26,8,0,0"
-                                           TextWrapping="Wrap"
-                                           Text="{x:Static res:UiText.SshAccessWarning}" />
-                                <TextBlock Style="{StaticResource CaptionStyle}"
-                                           Margin="26,10,0,4"
-                                           Text="{x:Static res:UiText.SshPasswordLabel}" />
-                                <PasswordBox x:Name="SshPasswordBox"
-                                             Margin="26,0,0,0"
-                                             Height="30"
-                                             IsEnabled="False"
-                                             PasswordChanged="SshPasswordBox_PasswordChanged" />
+                    <Grid Margin="0,18,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="12" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Border Grid.Column="0"
+                                Background="White"
+                                BorderBrush="{StaticResource HABorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="16,12">
+                            <StackPanel>
+                                <CheckBox x:Name="SshAccessCheckBox"
+                                          Checked="SshAccessCheckBox_Changed"
+                                          Unchecked="SshAccessCheckBox_Changed">
+                                    <TextBlock Style="{StaticResource BodyStyle}"
+                                               FontWeight="SemiBold"
+                                               Text="{x:Static res:UiText.SshAccessTitle}" />
+                                </CheckBox>
+                                <StackPanel x:Name="SshDetailsPanel"
+                                            Visibility="Collapsed">
+                                    <TextBlock Style="{StaticResource CaptionStyle}"
+                                               Margin="26,8,0,0"
+                                               TextWrapping="Wrap"
+                                               Text="{x:Static res:UiText.SshAccessWarning}" />
+                                    <TextBlock Style="{StaticResource CaptionStyle}"
+                                               Margin="26,10,0,4"
+                                               Text="{x:Static res:UiText.SshPasswordLabel}" />
+                                    <PasswordBox x:Name="SshPasswordBox"
+                                                 Margin="26,0,0,0"
+                                                 Height="30"
+                                                 IsEnabled="False"
+                                                 PasswordChanged="SshPasswordBox_PasswordChanged" />
+                                </StackPanel>
                             </StackPanel>
-                        </StackPanel>
-                    </Border>
+                        </Border>
+
+                        <Border Grid.Column="2"
+                                Background="White"
+                                BorderBrush="{StaticResource HABorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="16,12">
+                            <StackPanel>
+                                <CheckBox x:Name="LegacyBiosBootCheckBox"
+                                          Checked="LegacyBiosBootCheckBox_Changed"
+                                          Unchecked="LegacyBiosBootCheckBox_Changed">
+                                    <TextBlock Style="{StaticResource BodyStyle}"
+                                               FontWeight="SemiBold"
+                                               Text="{x:Static res:UiText.LegacyBiosTitle}" />
+                                </CheckBox>
+                                <StackPanel x:Name="LegacyBiosDetailsPanel"
+                                            Visibility="Collapsed">
+                                    <TextBlock Style="{StaticResource CaptionStyle}"
+                                               Margin="26,8,0,0"
+                                               TextWrapping="Wrap"
+                                               Text="{x:Static res:UiText.LegacyBiosWarning}" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
 
                     <Border Background="#FEF2F2"
                             BorderBrush="{StaticResource HADangerBrush}"

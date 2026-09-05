@@ -6,6 +6,7 @@ SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 . "$SCRIPT_DIR/logging.sh"
 . "$SCRIPT_DIR/tui.sh"
 . "$SCRIPT_DIR/uefi.sh"
+. "$SCRIPT_DIR/legacy-bios.sh"
 . "$SCRIPT_DIR/disk-detect.sh"
 . "$SCRIPT_DIR/haos-release.sh"
 . "$SCRIPT_DIR/image-cache.sh"
@@ -120,6 +121,7 @@ main() {
   done
 
   write_image_to_disk "$image_path" "$target_disk"
+  configure_legacy_bios_boot "$target_disk"
   if installer_unattended_enabled; then
     list_install_targets > "$targets_json"
     if ! write_install_complete_marker "$target_disk" "$targets_json" "$image_path"; then

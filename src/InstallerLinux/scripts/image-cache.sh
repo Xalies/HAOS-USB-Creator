@@ -178,6 +178,17 @@ installer_unattended_enabled() {
   ' "$config" >/dev/null
 }
 
+installer_legacy_bios_enabled() {
+  if [ "${HAOS_LEGACY_BIOS:-0}" = "1" ]; then
+    return 0
+  fi
+
+  config="$(read_installer_config 2>/dev/null || true)"
+  [ -n "$config" ] || return 1
+
+  jq -e '.legacyBiosBoot.enabled == true' "$config" >/dev/null
+}
+
 install_complete_marker_path() {
   cache_dir="$(find_cache_partition)"
   printf '%s\n' "$cache_dir/install-complete.json"

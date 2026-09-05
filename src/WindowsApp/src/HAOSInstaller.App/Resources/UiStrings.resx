@@ -220,10 +220,10 @@
     <value>Status</value>
   </data>
   <data name="ConfirmEraseText" xml:space="preserve">
-    <value>I understand this will erase the selected USB drive and create an all-in-one HAOS install USB.</value>
+    <value>This will erase the selected USB drive and create an all-in-one HAOS install USB.</value>
   </data>
   <data name="UnattendedTitle" xml:space="preserve">
-    <value>Unattended. Installs to the internal disk without user interaction</value>
+    <value>Unattended install</value>
   </data>
   <data name="UnattendedWarning" xml:space="preserve">
     <value>Only use this on a dedicated system with one disk. Installer should fall back to a choice if more than one disk is detected during install. If you plan to keep the USB after creating it, LABEL IT!!!.</value>
@@ -232,13 +232,19 @@
     <value>I understand the booted installer will automatically erase the detected internal target disk without asking me again.</value>
   </data>
   <data name="SshAccessTitle" xml:space="preserve">
-    <value>Enable installer SSH access.</value>
+    <value>Enable installer SSH</value>
   </data>
   <data name="SshAccessWarning" xml:space="preserve">
-    <value>For headless installs. The booted installer will try DHCP, start SSH, and allow root login with the password you choose here. The password is stored on this USB.</value>
+    <value>Allows root login. This password is stored on this USB.</value>
   </data>
   <data name="SshPasswordLabel" xml:space="preserve">
     <value>SSH password (at least 8 characters)</value>
+  </data>
+  <data name="LegacyBiosTitle" xml:space="preserve">
+    <value>Legacy BIOS support</value>
+  </data>
+  <data name="LegacyBiosWarning" xml:space="preserve">
+    <value>Enable support for installing HAOS onto older machines without UEFI.</value>
   </data>
   <data name="ButtonStartWrite" xml:space="preserve">
     <value>Start write</value>
@@ -365,6 +371,9 @@
   </data>
   <data name="FinishNextStepUnattended" xml:space="preserve">
     <value>When the Linux installer starts, it will check the Home Assistant OS image on the USB, look online for a newer verified image, and use the newest valid option automatically. Because unattended mode is enabled, it will continue only when it finds one eligible internal disk, erase that disk, write Home Assistant OS, set up boot drive where possible and reboot when finished. Unattended setups are marked on install USB so install loops should have protection for clean installs.</value>
+  </data>
+  <data name="FinishLegacyBiosNote" xml:space="preserve">
+    <value>Legacy BIOS support is enabled. After writing Home Assistant OS, the installer will add the extra GRUB boot files needed by older non-UEFI PCs.</value>
   </data>
   <data name="FinishSshAccessFormat" xml:space="preserve">
     <value>SSH is enabled for the booted installer. Connect as root using the SSH password you set: {0}</value>

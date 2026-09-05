@@ -184,6 +184,16 @@ public partial class MainWindow : Window
 
     private void SshPasswordBox_PasswordChanged(object sender, RoutedEventArgs e) => UpdateConfirmWriteButtonState();
 
+    private void LegacyBiosBootCheckBox_Changed(object sender, RoutedEventArgs e)
+    {
+        if (LegacyBiosDetailsPanel is not null)
+        {
+            LegacyBiosDetailsPanel.Visibility = LegacyBiosBootCheckBox.IsChecked == true
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+        }
+    }
+
     private void UpdateConfirmWriteButtonState()
     {
         var usbEraseConfirmed = ConfirmEraseCheckBox.IsChecked == true;
@@ -195,6 +205,7 @@ public partial class MainWindow : Window
     private async void ConfirmWriteButton_Click(object sender, RoutedEventArgs e)
     {
         var unattendedInstall = UnattendedInstallCheckBox.IsChecked == true;
+        var legacyBiosBoot = LegacyBiosBootCheckBox.IsChecked == true;
         _sshPassword = SshAccessCheckBox.IsChecked == true ? SshPasswordBox.Password : null;
         GoToStep(InstallerStep.Write);
         PrepareProgressBar.Value = 0;
@@ -251,6 +262,7 @@ public partial class MainWindow : Window
                     await ProvisionUsbCacheWithRetryAsync(
                         stagedPayload,
                         unattendedInstall,
+                        legacyBiosBoot,
                         _sshPassword,
                         CancellationToken.None);
                 }
@@ -258,6 +270,7 @@ public partial class MainWindow : Window
                 {
                     await WriteInstallerConfigWithRetryAsync(
                         unattendedInstall,
+                        legacyBiosBoot,
                         _sshPassword,
                         CancellationToken.None);
 
@@ -265,7 +278,7 @@ public partial class MainWindow : Window
                     AppendLog("No Home Assistant OS image is available on the USB. The booted installer will check if online.");
                 }
 
-                ConfigureFinishText(unattendedInstall, stagedPayload is not null, _sshPassword);
+                ConfigureFinishText(unattendedInstall, legacyBiosBoot, stagedPayload is not null, _sshPassword);
                 GoToStep(InstallerStep.Finish);
             }
             finally
@@ -284,6 +297,7 @@ public partial class MainWindow : Window
     private async Task ProvisionUsbCacheWithRetryAsync(
         HaosPayloadStageResult stagedPayload,
         bool unattendedInstall,
+        bool legacyBiosBoot,
         string? sshPassword,
         CancellationToken cancellationToken)
     {
@@ -292,6 +306,7 @@ public partial class MainWindow : Window
             await _usbCacheProvisioningService.WriteInstallerConfigAsync(
                 cacheRoot,
                 unattendedInstall,
+                legacyBiosBoot,
                 sshPassword,
                 cancellationToken);
 
@@ -305,6 +320,7 @@ public partial class MainWindow : Window
 
     private async Task WriteInstallerConfigWithRetryAsync(
         bool unattendedInstall,
+        bool legacyBiosBoot,
         string? sshPassword,
         CancellationToken cancellationToken)
     {
@@ -313,6 +329,7 @@ public partial class MainWindow : Window
             await _usbCacheProvisioningService.WriteInstallerConfigAsync(
                 cacheRoot,
                 unattendedInstall,
+                legacyBiosBoot,
                 sshPassword,
                 cancellationToken);
         }, cancellationToken);
@@ -387,6 +404,7 @@ public partial class MainWindow : Window
         ConfirmEraseCheckBox.IsChecked = false;
         UnattendedInstallCheckBox.IsChecked = false;
         UnattendedWarningCheckBox.IsChecked = false;
+        LegacyBiosBootCheckBox.IsChecked = false;
         SshAccessCheckBox.IsChecked = false;
         SshPasswordBox.Password = string.Empty;
         SshPasswordBox.IsEnabled = false;
@@ -401,7 +419,7 @@ public partial class MainWindow : Window
         GoToStep(InstallerStep.Welcome);
     }
 
-    private void ConfigureFinishText(bool unattendedInstall, bool hasCachedPayload, string? sshPassword)
+    private void ConfigureFinishText(bool unattendedInstall, bool legacyBiosBoot, bool hasCachedPayload, string? sshPassword)
     {
         FinishSummaryText.Text = hasCachedPayload
             ? UiText.FinishSummaryWithPayload
@@ -410,6 +428,11 @@ public partial class MainWindow : Window
         var nextStepText = unattendedInstall
             ? UiText.FinishNextStepUnattended
             : UiText.FinishNextStepAttended;
+
+        if (legacyBiosBoot)
+        {
+            nextStepText += Environment.NewLine + Environment.NewLine + UiText.FinishLegacyBiosNote;
+        }
 
         FinishNextStepText.Text = string.IsNullOrWhiteSpace(sshPassword)
             ? nextStepText

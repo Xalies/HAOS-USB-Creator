@@ -105,6 +105,7 @@ xorriso -osirrox on -indev "$iso_path" -extract / /work/extract >/dev/null
 touch /work/extract/.boot_repository
 find /work/extract -type f \( -name '*.cfg' -o -name '*.conf' \) \
   -exec sed -i "s/HAOS-INSTLR/$BOOT_LABEL/g" {} +
+sed -i "s/console=tty1/console=tty1 noapic/g" /work/extract/boot/syslinux/syslinux.cfg
 mkdir -p /work/initramfs
 (
   cd /work/initramfs
@@ -167,6 +168,8 @@ start=${CACHE_START_SECTOR}, size=${CACHE_SECTORS}, type=EBD0A0A2-B9E5-4433-87C0
 LAYOUT
 
 sfdisk "$image_path" < /work/layout.sfdisk >/dev/null
+sgdisk -A 1:set:2 "$image_path" >/dev/null
+dd if=/usr/share/syslinux/gptmbr.bin of="$image_path" bs=440 count=1 conv=notrunc status=none
 
 boot_fat="/work/boot.fat"
 cache_fat="/work/cache.fat"
@@ -175,6 +178,7 @@ truncate -s "$((CACHE_SECTORS * 512))" "$cache_fat"
 
 mformat -i "$boot_fat" -F -v "$BOOT_LABEL" ::
 mcopy -i "$boot_fat" -s /work/extract/* ::
+syslinux --install "$boot_fat"
 
 mformat -i "$cache_fat" -F -v "$CACHE_LABEL" ::
 mmd -i "$cache_fat" ::/cache ::/logs
@@ -199,7 +203,7 @@ built_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
   printf '%s\n' '  "builder": "src/InstallerLinux/build/build-installer-image.sh",'
   printf '%s\n' '  "layout": {'
   printf '%s\n' '    "partitionTable": "gpt",'
-  printf '%s\n' "    \"bootPartition\": \"FAT32 ESP, label $BOOT_LABEL, GPT name HAOS AIO USB\","
+  printf '%s\n' "    \"bootPartition\": \"FAT32 ESP, label $BOOT_LABEL, GPT name HAOS AIO USB, UEFI and legacy BIOS bootable\","
   printf '%s\n' "    \"cachePartition\": \"FAT32 data, label $CACHE_LABEL, GPT name HAOS Cache, no default Windows drive letter\""
   printf '%s\n' '  }'
   printf '%s\n' '}'
@@ -224,6 +228,7 @@ RUN apk add --no-cache \\
     curl \\
     xz \\
     syslinux \\
+    sgdisk \\
     abuild \\
     sudo \\
     coreutils \\

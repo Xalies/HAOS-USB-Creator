@@ -7,6 +7,7 @@ iproute2
 linux-firmware
 jq
 xz
+lsblk
 util-linux
 util-linux-misc
 parted
@@ -14,6 +15,8 @@ pv
 e2fsprogs
 dosfstools
 gptfdisk
+sgdisk
+grub-bios
 efibootmgr
 efivar
 pciutils

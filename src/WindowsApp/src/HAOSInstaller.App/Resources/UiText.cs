@@ -48,6 +48,8 @@ public static class UiText
     public static string SshAccessTitle => Get();
     public static string SshAccessWarning => Get();
     public static string SshPasswordLabel => Get();
+    public static string LegacyBiosTitle => Get();
+    public static string LegacyBiosWarning => Get();
     public static string ButtonStartWrite => Get();
     public static string WriteHeading => Get();
     public static string WriteSubheading => Get();
@@ -70,6 +72,7 @@ public static class UiText
     public static string FinishSummaryWithPayload => Get();
     public static string FinishNextStepAttended => Get();
     public static string FinishNextStepUnattended => Get();
+    public static string FinishLegacyBiosNote => Get();
     public static string FinishSshAccessFormat => Get();
     public static string BuyMeCoffeeShortText => Get();
     public static string BuyMeCoffeeTooltip => Get();

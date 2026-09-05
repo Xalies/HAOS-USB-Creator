@@ -17,6 +17,7 @@ public sealed class UsbCacheProvisioningService
     public async Task WriteInstallerConfigAsync(
         string usbCacheRoot,
         bool unattendedInstallEnabled,
+        bool legacyBiosBootEnabled,
         string? sshPassword,
         CancellationToken cancellationToken)
     {
@@ -31,7 +32,9 @@ public sealed class UsbCacheProvisioningService
                 RunOnce: unattendedInstallEnabled),
             Ssh: new SshInstallConfig(
                 Enabled: !string.IsNullOrWhiteSpace(sshPassword),
-                Password: sshPassword ?? string.Empty));
+                Password: sshPassword ?? string.Empty),
+            LegacyBiosBoot: new LegacyBiosBootConfig(
+                Enabled: legacyBiosBootEnabled));
 
         var configPath = Path.Combine(destinationCacheDirectory, "installer-config.json");
         await using var stream = new FileStream(configPath, FileMode.Create, FileAccess.Write, FileShare.Read, 16 * 1024, useAsync: true);
@@ -429,7 +432,8 @@ public sealed record UsbCacheProvisionResult(
 public sealed record InstallerConfig(
     int SchemaVersion,
     UnattendedInstallConfig Unattended,
-    SshInstallConfig Ssh);
+    SshInstallConfig Ssh,
+    LegacyBiosBootConfig LegacyBiosBoot);
 
 public sealed record UnattendedInstallConfig(
     bool Enabled,
@@ -439,3 +443,6 @@ public sealed record UnattendedInstallConfig(
 public sealed record SshInstallConfig(
     bool Enabled,
     string Password);
+
+public sealed record LegacyBiosBootConfig(
+    bool Enabled);

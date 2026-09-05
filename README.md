@@ -70,6 +70,10 @@ http://homeassistant.local:8123
 
 or by using the IP address shown by your router.
 
+## Legacy boot
+
+Check this to enable the install into older non-UEFI systems
+
 ## Attended And Unattended Install
 
 The normal install mode asks you to choose the target disk and confirm before erasing it.
@@ -88,7 +92,7 @@ Use this if the target PC is headless and unattended mode does not suit the inst
 root
 ```
 
-SSH still needs working network hardware and DHCP. If the installer cannot bring up the network interface, SSH will not be reachable.
+If the installer cannot bring up the network interface, SSH will not be reachable.
 
 ## Unofficial Project
 

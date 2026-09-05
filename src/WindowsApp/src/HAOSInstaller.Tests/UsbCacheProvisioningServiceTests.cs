@@ -54,6 +54,7 @@ public sealed class UsbCacheProvisioningServiceTests
             await new UsbCacheProvisioningService().WriteInstallerConfigAsync(
                 tempDirectory,
                 unattendedInstallEnabled: true,
+                legacyBiosBootEnabled: true,
                 sshPassword: "test-password",
                 CancellationToken.None);
 
@@ -65,6 +66,7 @@ public sealed class UsbCacheProvisioningServiceTests
             Assert.Contains("\"runOnce\": true", configJson);
             Assert.Contains("\"ssh\"", configJson);
             Assert.Contains("\"password\": \"test-password\"", configJson);
+            Assert.Contains("\"legacyBiosBoot\"", configJson);
         }
         finally
         {
