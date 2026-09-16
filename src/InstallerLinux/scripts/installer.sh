@@ -32,6 +32,23 @@ check_runtime_dependencies() {
   check_write_dependencies
 }
 
+prompt_standalone_legacy_bios() {
+  read_installer_config >/dev/null 2>&1 && return 0
+  installer_unattended_enabled && return 0
+  installer_legacy_bios_enabled && return 0
+
+  if tui_confirm \
+    "Legacy BIOS Support" \
+    "Enable this only for older PCs that cannot boot UEFI.\n\nThe installer will keep the normal Home Assistant OS GPT layout, then add BIOS-mode GRUB support after writing the disk." \
+    "Enable" \
+    "Skip"; then
+    export HAOS_LEGACY_BIOS=1
+    log_warn "Legacy BIOS support enabled from standalone installer prompt."
+  else
+    log_info "Legacy BIOS support was not enabled."
+  fi
+}
+
 main() {
   log_info "Starting HAOS AIO Installer USB Linux flow."
   if [ -f /etc/haos-installer-build ]; then
@@ -55,6 +72,7 @@ main() {
     tui_message \
       "HAOS AIO Installer USB" \
       "This installer will install Home Assistant OS onto a dedicated internal disk.\n\nIt will check for a downloaded image on this USB, look online for a newer image when possible, then ask you to choose the disk to erase."
+    prompt_standalone_legacy_bios
   fi
 
   targets_json="${HAOS_TARGETS_JSON:-/tmp/haos-install-targets.json}"
