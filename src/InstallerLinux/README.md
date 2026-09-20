@@ -59,6 +59,11 @@ That wrapper launches:
 
 ## Installer Flow
 
+The standalone ISO offers UEFI (default) or legacy BIOS installation support
+with a five-second countdown. Press `L` for legacy BIOS, or `U` / Enter for
+UEFI immediately. With no input, it continues with UEFI. USBs prepared by the
+Windows app skip this choice and use the mode saved by the app.
+
 The installer:
 
 1. Checks runtime dependencies.

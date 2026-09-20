@@ -30,6 +30,8 @@ mkdir -p "$tmpdir/mkimage-profile"
 cp -R "$INSTALLER_DIR/rootfs/." "$tmpdir/rootfs/"
 cp "$INSTALLER_DIR"/scripts/*.sh "$tmpdir/rootfs/usr/local/bin/haos-installer/"
 cp "$SCRIPT_DIR/mkimg.haos_installer.sh" "$tmpdir/mkimage-profile/mkimg.haos_installer.sh"
+# Windows checkouts may contain CRLF in extensionless Linux startup files.
+find "$tmpdir/rootfs" -type f -exec sed -i 's/\r$//' {} +
 
 build_id="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
 cat > "$tmpdir/rootfs/etc/haos-installer-build" <<BUILDINFO
@@ -64,6 +66,7 @@ CACHE_SECTORS=3665887
 
 mkdir -p /iso-out /work/extract
 chown -R builder:builder /iso-out /work /aports
+sed -i 's/menuentry "Linux \$_f"/menuentry "HAOS BareMetal Installer"/' /aports/scripts/mkimg.base.sh
 
 su builder -c "cd /aports/scripts && sh mkimage.sh \
   --profile haos_installer \

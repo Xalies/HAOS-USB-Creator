@@ -37,15 +37,24 @@ prompt_standalone_legacy_bios() {
   installer_unattended_enabled && return 0
   installer_legacy_bios_enabled && return 0
 
-  if tui_confirm \
-    "Legacy BIOS Support" \
-    "Enable this only for older PCs that cannot boot UEFI.\n\nThe installer will keep the normal Home Assistant OS GPT layout, then add BIOS-mode GRUB support after writing the disk." \
-    "Enable" \
-    "Skip"; then
+  printf '\nInstallation boot support\n[U] UEFI (default)    [L] Legacy BIOS (older PCs without UEFI)\n' >/dev/tty
+  choice=""
+  for seconds in 5 4 3 2 1; do
+    printf '\rStarting with UEFI in %s seconds. Press U or L: ' "$seconds" >/dev/tty
+    # Alpine BusyBox ash supports timed, single-character reads.
+    if read -r -t 1 -n 1 choice </dev/tty; then
+      case "$choice" in
+        u|U|l|L|"") break ;;
+      esac
+    fi
+  done
+  printf '\n' >/dev/tty
+
+  if [ "$choice" = "l" ] || [ "$choice" = "L" ]; then
     export HAOS_LEGACY_BIOS=1
     log_warn "Legacy BIOS support enabled from standalone installer prompt."
   else
-    log_info "Legacy BIOS support was not enabled."
+    log_info "UEFI installation selected."
   fi
 }
 
