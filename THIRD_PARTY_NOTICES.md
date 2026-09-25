@@ -23,11 +23,23 @@ Home Assistant, Home Assistant OS, Nabu Casa, and Open Home Foundation names and
 
 The Windows app is built with .NET and WPF. Microsoft .NET runtime, SDK, and related packages remain under their respective Microsoft and upstream licenses.
 
+## Linux AppImage
+
+The Linux AppImage bundles Python, GTK and related libraries, and Linux disk utilities. It is assembled with PyInstaller and AppImage tooling. These components remain under their respective upstream licenses:
+
+- <https://www.python.org/>
+- <https://www.gtk.org/>
+- <https://github.com/util-linux/util-linux>
+- <https://sourceforge.net/projects/gptfdisk/>
+- <https://pyinstaller.org/>
+- <https://appimage.org/>
+
 ## Build And Release Outputs
 
 Generated release files can include:
 
 - a Windows application package
+- a Linux AppImage
 - a Linux boot image
 - a bootable ISO image for VM use
 

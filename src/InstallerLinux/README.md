@@ -1,6 +1,6 @@
 # HAOS AIO Installer USB Linux Environment
 
-This folder contains the Alpine-based Linux installer environment that boots from the USB created by the Windows app.
+This folder contains the Alpine-based Linux installer environment that boots from the USB created by the Windows or Linux app.
 
 The Linux environment writes the official Home Assistant OS generic x86-64 image to the selected internal disk. It does not install a Linux desktop, does not install Home Assistant Supervised, and does not preserve data on the selected target disk.
 
@@ -61,8 +61,8 @@ That wrapper launches:
 
 The standalone ISO offers UEFI (default) or legacy BIOS installation support
 with a five-second countdown. Press `L` for legacy BIOS, or `U` / Enter for
-UEFI immediately. With no input, it continues with UEFI. USBs prepared by the
-Windows app skip this choice and use the mode saved by the app.
+UEFI immediately. With no input, it continues with UEFI. USBs prepared by either
+desktop app skip this choice and use the mode saved by the app.
 
 The installer:
 

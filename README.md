@@ -1,14 +1,12 @@
 # HAOS AIO USB Creator
 
-HAOS AIO USB Creator is an unofficial Windows tool for creating a bootable all-in-one installer USB for Home Assistant OS on a dedicated generic x86-64 PC.
-=======
-HAOS AIO USB Creator is an unofficial Windows tool for creating a bootable all-in-one installer USB for **Home Assistant OS on a dedicated generic x86-64 PC**.
+HAOS AIO USB Creator is an unofficial Windows and Linux tool for creating a bootable all-in-one installer USB for **Home Assistant OS on a dedicated generic x86-64 PC**.
 
 It is meant for dedicated x86-64 machines.
 
 ## What It Does
 
-The Windows app:
+The Windows and Linux desktop apps:
 
 - detects removable USB drives
 - helps you choose the USB drive to turn into an installer
@@ -38,22 +36,23 @@ When you boot another PC from that USB, the installer:
 
 ## Download
 
-From the GitHub release page, most users should download:
+From the GitHub release page, download the package for your desktop:
 
 - `HAOS-USB-Creator-win-x64.zip`
+- `HAOS-USB-Creator-linux-x86_64.AppImage`
 
 Optional:
 
 - `HAOS-Installer-ISO.zip`
 
-The ISO is useful for VMs, Ventoy drives, or optical boot media. Unlike the USB created by the Windows app, the ISO does not contain a cached Home Assistant OS image, so it needs internet access during install. The ISO by itself cannot install HAOS for a legacy boot. (for now)
+The ISO is useful for VMs, Ventoy drives, or optical boot media. Unlike the USB created by either desktop app, the ISO does not contain a cached Home Assistant OS image, so it needs internet access during install. The ISO by itself cannot install HAOS for a legacy boot. (for now)
 
 
 ## Basic Use
 
-1. Download and extract `HAOS-USB-Creator-win-x64.zip`.
-2. Run the app on Windows.
-3. Allow administrator permission when prompted.
+1. Download and extract the Windows package, or download the Linux AppImage.
+2. Run the app (`HAOSInstaller.App.exe` on Windows or the executable AppImage on Linux).
+3. Allow administrator permission when prompted for the USB write.
 4. Insert the USB drive you want to turn into the installer.
 5. Select the USB drive in the app.
 6. Confirm the erase warning.
@@ -61,6 +60,8 @@ The ISO is useful for VMs, Ventoy drives, or optical boot media. Unlike the USB 
 8. Move the USB to the PC that will run Home Assistant OS.
 9. Boot that PC from the USB.
 10. Follow the installer prompts.
+
+Linux requirements and source checkout instructions are in [src/LinuxApp/README.md](src/LinuxApp/README.md).
 
 After installation, Home Assistant should become available at:
 
@@ -86,7 +87,7 @@ Do not use unattended mode on a machine with multiple internal drives.
 
 The USB creator can enable SSH access in the booted installer.
 
-Use this if the target PC is headless and unattended mode does not suit the install. The app generates a temporary password and shows it when the USB is ready. After booting the USB, connect as:
+Use this if the target PC is headless and unattended mode does not suit the install. Set a temporary password in the app, then connect after booting the USB as:
 
 ```text
 root

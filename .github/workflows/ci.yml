@@ -8,6 +8,24 @@ on:
   workflow_dispatch:
 
 jobs:
+  linux-app:
+    name: Linux app
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Test
+        run: python3 -m unittest discover -s src/LinuxApp/tests -v
+
+      - name: Check GTK import
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-gi gir1.2-gtk-3.0
+          cd src/LinuxApp
+          /usr/bin/python3 -c 'import gui'
+
   windows-app:
     name: Windows app
     runs-on: windows-latest

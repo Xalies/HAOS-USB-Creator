@@ -1,0 +1,9 @@
+#!/bin/sh
+set -eu
+APPDIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+export APPDIR
+export PATH="$APPDIR/usr/bin/haos-usb-creator/_internal/tools:$PATH"
+case "$APPDIR" in
+  */appimage_extracted_*) export HAOS_APPIMAGE_EXTRACTED=1 ;;
+esac
+exec "$APPDIR/usr/bin/haos-usb-creator/haos-usb-creator" "$@"

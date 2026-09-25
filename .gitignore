@@ -37,3 +37,5 @@ haos_generic-*.img.xz.sha256
 .vscode/
 Thumbs.db
 Desktop.ini
+__pycache__/
+src/LinuxApp/boot-image/

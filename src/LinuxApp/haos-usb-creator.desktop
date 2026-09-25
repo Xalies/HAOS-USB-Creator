@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=HAOS AIO USB Creator
+Comment=Create a Home Assistant OS installer USB
+Exec=AppRun
+Icon=haos-usb-creator
+Categories=Utility;System;
+Terminal=false

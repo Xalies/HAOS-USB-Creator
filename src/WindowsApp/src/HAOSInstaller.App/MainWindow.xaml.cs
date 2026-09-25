@@ -396,7 +396,7 @@ public partial class MainWindow : Window
 
     private static bool IsSafeToStartHaosDownload(ImageWriteProgress progress)
     {
-        return progress.Message.Contains(" is offline.", StringComparison.OrdinalIgnoreCase);
+        return progress.Message.Contains(" for raw write access.", StringComparison.OrdinalIgnoreCase);
     }
 
     private void StartOver_Click(object sender, RoutedEventArgs e)

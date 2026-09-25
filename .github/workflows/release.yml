@@ -51,10 +51,46 @@ jobs:
           path: artifacts/HAOS-Installer-ISO.zip
           if-no-files-found: error
 
+  linux-app:
+    name: Build Linux AppImage
+    runs-on: ubuntu-22.04
+    needs: boot-image
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Test
+        run: python3 -m unittest discover -s src/LinuxApp/tests -v
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-venv python3-gi gir1.2-gtk-3.0 gdisk udev
+
+      - name: Download boot image
+        uses: actions/download-artifact@v8
+        with:
+          name: haos-usb-creator-boot-image
+          path: src/LinuxApp/boot-image
+
+      - name: Build AppImage
+        run: bash src/LinuxApp/build-appimage.sh src/LinuxApp/boot-image artifacts/linux-app
+
+      - name: Test self-contained AppImage
+        run: APPIMAGE_EXTRACT_AND_RUN=1 artifacts/linux-app/HAOS-USB-Creator-linux-x86_64.AppImage --self-test
+
+      - name: Upload Linux app
+        uses: actions/upload-artifact@v7
+        with:
+          name: haos-usb-creator-linux-x86_64-appimage
+          path: artifacts/linux-app/HAOS-USB-Creator-linux-x86_64.AppImage
+          if-no-files-found: error
+
   windows-app:
     name: Publish Windows app
     runs-on: windows-latest
-    needs: boot-image
+    needs: [boot-image, linux-app]
 
     steps:
       - name: Checkout
@@ -75,6 +111,12 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           name: haos-installer-iso-zip
+          path: publish
+
+      - name: Download Linux app
+        uses: actions/download-artifact@v8
+        with:
+          name: haos-usb-creator-linux-x86_64-appimage
           path: publish
 
       - name: Validate bundled boot image
@@ -126,4 +168,5 @@ jobs:
           tag_name: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
           files: |
             publish/HAOS-USB-Creator-win-x64.zip
+            publish/HAOS-USB-Creator-linux-x86_64.AppImage
             publish/HAOS-Installer-ISO.zip
