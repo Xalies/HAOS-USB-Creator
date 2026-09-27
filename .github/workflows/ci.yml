@@ -16,15 +16,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Test
-        run: python3 -m unittest discover -s src/LinuxApp/tests -v
-
-      - name: Check GTK import
+      - name: Install GTK and virtual display
         run: |
           sudo apt-get update
-          sudo apt-get install -y python3-gi gir1.2-gtk-3.0
-          cd src/LinuxApp
-          /usr/bin/python3 -c 'import gui'
+          sudo apt-get install -y python3-gi gir1.2-gtk-3.0 xvfb xauth
+
+      - name: Test
+        run: xvfb-run -a /usr/bin/python3 -m unittest discover -s src/LinuxApp/tests -v
 
   windows-app:
     name: Windows app

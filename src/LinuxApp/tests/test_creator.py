@@ -2,10 +2,11 @@ import hashlib
 import io
 import json
 import os
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import call, patch
 
 import sys
 
@@ -15,6 +16,34 @@ import main
 
 
 class CreatorTests(unittest.TestCase):
+    def test_partition_update_unmounts_before_partx(self):
+        disk = {"path": "/dev/sdb", "id": "8:16", "size": 8000,
+                "mounts": ["/media/HAOS-CACHE"]}
+        with patch.object(creator, "usb_disks", return_value=[disk]), \
+             patch.object(creator, "run") as run:
+            creator._update_partitions(disk)
+        self.assertEqual([call("umount", "/media/HAOS-CACHE"),
+                          call("partx", "--update", "/dev/sdb"),
+                          call("udevadm", "settle")], run.call_args_list)
+
+    def test_copy_reports_complete_after_sync(self):
+        with tempfile.TemporaryDirectory() as temp:
+            source = Path(temp) / "source.img"
+            target = Path(temp) / "target.img"
+            source.write_bytes(b"installer")
+            events = []
+            with patch.object(creator.os, "fsync", side_effect=lambda _: events.append("synced")):
+                creator._copy(source, target, events.append, "Writing boot image")
+            self.assertEqual("synced", events[-2])
+            self.assertTrue(events[-1].startswith("Writing boot image: 100%"))
+
+    def test_command_error_shows_device_reason(self):
+        failure = subprocess.CompletedProcess(("sgdisk", "-e", "/dev/sdb"), 1, "",
+                                              "sgdisk: /dev/sdb: Device or resource busy\n")
+        with patch.object(creator.subprocess, "run", return_value=failure):
+            with self.assertRaisesRegex(RuntimeError, "sgdisk.*Device or resource busy"):
+                creator.run("sgdisk", "-e", "/dev/sdb")
+
     def test_usb_discovery_excludes_system_disk_and_non_usb(self):
         disks = {"blockdevices": [
             {"path": "/dev/sda", "type": "disk", "tran": "sata", "size": 32 * 1024**3,

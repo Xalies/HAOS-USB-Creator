@@ -14,7 +14,7 @@ expected="$(awk 'NR == 1 { print $1 }' "$checksum")"
 actual="$(sha256sum "$image" | awk '{ print $1 }')"
 test "$expected" = "$actual" || { echo "Boot image SHA-256 mismatch" >&2; exit 1; }
 
-for tool in python3 lsblk wipefs sgdisk blockdev udevadm mount umount sync curl; do
+for tool in python3 lsblk sgdisk partx udevadm mount umount sync curl; do
   command -v "$tool" >/dev/null || { echo "Build tool missing: $tool" >&2; exit 1; }
 done
 
@@ -27,11 +27,12 @@ python3 -m venv --system-site-packages "$work/venv"
 "$work/venv/bin/pip" install --disable-pip-version-check --quiet pyinstaller==6.22.3
 
 tools=()
-for tool in lsblk wipefs sgdisk blockdev udevadm mount umount sync; do
+for tool in lsblk sgdisk partx udevadm mount umount sync; do
   tools+=(--add-binary "$(command -v "$tool"):tools")
 done
 "$work/venv/bin/pyinstaller" --noconfirm --onedir --name haos-usb-creator \
   --distpath "$work/dist" --workpath "$work/build" --specpath "$work" \
+  --add-data "$repo_dir/src/WindowsApp/src/HAOSInstaller.App/Assets/bmc-button.png:assets" \
   "${tools[@]}" "$script_dir/main.py"
 
 appdir="$work/HAOS-USB-Creator.AppDir"

@@ -29,7 +29,7 @@ def main():
         from creator import usb_disks
 
         appdir = Path(os.environ["APPDIR"])
-        for tool in ("lsblk", "wipefs", "sgdisk", "blockdev", "udevadm", "mount", "umount", "sync"):
+        for tool in ("lsblk", "sgdisk", "partx", "udevadm", "mount", "umount", "sync"):
             assert Path(shutil.which(tool)).is_relative_to(appdir), f"{tool} was not bundled"
         assert any(str(appdir) in line for line in Path("/proc/self/maps").read_text().splitlines()
                    if "libgtk-3.so.0" in line), "Bundled GTK library was not loaded"

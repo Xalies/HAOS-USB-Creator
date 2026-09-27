@@ -21,7 +21,11 @@ SYSTEM_MOUNTS = {"/", "/boot", "/boot/efi", "/home", "/var", "[SWAP]"}
 
 
 def run(*args):
-    return subprocess.run(args, check=True, text=True, capture_output=True).stdout
+    result = subprocess.run(args, text=True, capture_output=True)
+    if result.returncode:
+        reason = (result.stderr or result.stdout).strip() or f"exit status {result.returncode}"
+        raise RuntimeError(f"{args[0]} failed: {reason}")
+    return result.stdout
 
 
 def _nodes(tree):
@@ -106,12 +110,18 @@ def download_release(release, progress):
         with urllib.request.urlopen(request, timeout=60) as remote, open(temporary, "wb") as local:
             digest = hashlib.sha256()
             copied = 0
+            last_percent = 0
+            started = time.monotonic()
             while chunk := remote.read(1024 * 1024):
                 local.write(chunk)
                 digest.update(chunk)
                 copied += len(chunk)
-                if copied % (64 * 1024 * 1024) < len(chunk):
-                    progress(f"Downloaded {copied // (1024 * 1024)} MiB")
+                if release["size"]:
+                    percent = min(100, copied * 100 // release["size"])
+                    if percent >= last_percent + 5 or copied == release["size"]:
+                        speed = copied / max(time.monotonic() - started, 0.001) / 1024**2
+                        progress(f"Downloading Home Assistant OS: {percent}% ({speed:.1f} MiB/s)")
+                        last_percent = percent
         if copied != release["size"] or digest.hexdigest() != release["sha256"]:
             raise ValueError("Downloaded Home Assistant OS image failed size or SHA-256 verification.")
         temporary.replace(target)
@@ -123,7 +133,8 @@ def download_release(release, progress):
 def _copy(source, target, progress, label):
     size = Path(source).stat().st_size
     copied = 0
-    last_percent = -1
+    last_percent = 0
+    started = time.monotonic()
     with open(source, "rb") as src, open(target, "wb", buffering=0) as dst:
         while chunk := src.read(4 * 1024 * 1024):
             view = memoryview(chunk)
@@ -134,10 +145,14 @@ def _copy(source, target, progress, label):
                 view = view[written:]
             copied += len(chunk)
             percent = copied * 100 // size
-            if percent >= last_percent + 5 or copied == size:
-                progress(f"{label}: {percent}%")
+            if copied < size and percent >= last_percent + 5:
+                speed = copied / max(time.monotonic() - started, 0.001) / 1024**2
+                progress(f"{label}: {percent}% ({speed:.1f} MiB/s)")
                 last_percent = percent
+        progress(f"{label}: flushing data to USB")
         os.fsync(dst.fileno())
+    speed = copied / max(time.monotonic() - started, 0.001) / 1024**2
+    progress(f"{label}: 100% ({speed:.1f} MiB/s)")
 
 
 def _cache_partition(disk):
@@ -145,6 +160,18 @@ def _cache_partition(disk):
         if node.get("type") == "part" and node.get("label") == "HAOS-CACHE":
             return node["path"]
     return None
+
+
+def _update_partitions(disk):
+    current = next((item for item in usb_disks() if item["path"] == disk["path"]
+                    and item["id"] == disk["id"] and item["size"] == disk["size"]), None)
+    if current is None:
+        raise ValueError("The selected USB drive changed after writing the boot image.")
+    for mount in sorted(current["mounts"], key=len, reverse=True):
+        if mount.startswith("/"):
+            run("umount", mount)
+    run("partx", "--update", disk["path"])
+    run("udevadm", "settle")
 
 
 def write_usb(request, progress=print):
@@ -183,12 +210,11 @@ def write_usb(request, progress=print):
     if not any(item["path"] == disk["path"] and item["id"] == disk["id"] and item["size"] == disk["size"]
                and not item["mounts"] for item in usb_disks()):
         raise ValueError("The selected USB drive changed before writing.")
-    progress("Erasing existing USB partition signatures")
-    run("wipefs", "-a", disk["path"])
+    progress("Writing boot image: 0%")
     _copy(image, disk["path"], progress, "Writing boot image")
+    progress("Finalising USB: This will take a moment…")
     run("sgdisk", "-e", disk["path"])
-    run("blockdev", "--rereadpt", disk["path"])
-    subprocess.run(("udevadm", "settle"), check=True)
+    _update_partitions(disk)
     cache_partition = None
     for _ in range(15):
         cache_partition = _cache_partition(disk["path"])
@@ -229,6 +255,7 @@ def write_usb(request, progress=print):
                             "downloadedAtUtc": datetime.now(timezone.utc).isoformat(),
                             "createdBy": "HAOS USB Creator for Linux", "fileSizeBytes": Path(payload).stat().st_size}
                 (cache / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
+            progress("Synchronising USB: This may take a moment…")
             run("sync")
         finally:
             run("umount", mount)
