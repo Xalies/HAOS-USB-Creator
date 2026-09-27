@@ -60,13 +60,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Test
-        run: python3 -m unittest discover -s src/LinuxApp/tests -v
-
       - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y python3-venv python3-gi gir1.2-gtk-3.0 gdisk udev
+          sudo apt-get install -y python3-venv python3-gi gir1.2-gtk-3.0 xvfb xauth gdisk udev
+
+      - name: Test
+        run: xvfb-run -a /usr/bin/python3 -m unittest discover -s src/LinuxApp/tests -v
 
       - name: Download boot image
         uses: actions/download-artifact@v8

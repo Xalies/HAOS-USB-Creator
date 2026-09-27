@@ -33,6 +33,7 @@ done
 "$work/venv/bin/pyinstaller" --noconfirm --onedir --name haos-usb-creator \
   --distpath "$work/dist" --workpath "$work/build" --specpath "$work" \
   --add-data "$repo_dir/src/WindowsApp/src/HAOSInstaller.App/Assets/bmc-button.png:assets" \
+  --add-data "$repo_dir/src/WindowsApp/src/HAOSInstaller.App/Assets/InstallerIcon.png:assets" \
   "${tools[@]}" "$script_dir/main.py"
 
 appdir="$work/HAOS-USB-Creator.AppDir"

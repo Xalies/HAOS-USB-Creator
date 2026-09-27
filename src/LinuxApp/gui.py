@@ -22,19 +22,46 @@ class CreatorWindow(Gtk.Window):
     def __init__(self):
         super().__init__(title="HAOS AIO USB Creator")
         self.set_default_size(980, 640)
-        self.set_border_width(18)
         self.connect("destroy", Gtk.main_quit)
         self.disks = []
         self.pulsing_step = None
-        root = Gtk.Box(spacing=24)
+        assets = Path(__file__).resolve().parent / "assets"
+        if not assets.exists():
+            assets = Path(__file__).resolve().parents[1] / "WindowsApp" / "src" / "HAOSInstaller.App" / "Assets"
+        icon = GdkPixbuf.Pixbuf.new_from_file(str(assets / "InstallerIcon.png"))
+        self.set_icon(icon)
+        css = Gtk.CssProvider()
+        css.load_from_data(b"""
+            window { background-color: #F7F7F9; color: #1A1A2E; }
+            .ha-sidebar { background-color: #1C1C2E; }
+            .ha-sidebar label { color: #FFFFFF; }
+            .ha-sidebar .ha-muted { color: #8FA9C4; }
+            .ha-sidebar .ha-brand-sub { color: #7090B0; }
+            .ha-sidebar .ha-active { color: #41BDF5; }
+            .ha-sidebar separator { background-color: #29445F; }
+            progressbar progress { background-color: #41BDF5; }
+        """)
+        Gtk.StyleContext.add_provider_for_screen(self.get_screen(), css, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+        root = Gtk.Box()
         self.add(root)
+        sidebar_bg = Gtk.EventBox()
+        sidebar_bg.set_size_request(220, -1)
+        sidebar_bg.get_style_context().add_class("ha-sidebar")
+        root.pack_start(sidebar_bg, False, False, 0)
         sidebar = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=16)
-        sidebar.set_size_request(170, -1)
-        root.pack_start(sidebar, False, False, 0)
+        sidebar.set_margin_start(22)
+        sidebar.set_margin_end(22)
+        sidebar.set_margin_top(26)
+        sidebar.set_margin_bottom(22)
+        sidebar_bg.add(sidebar)
+        brand_icon = Gtk.Image.new_from_pixbuf(icon.scale_simple(68, 68, GdkPixbuf.InterpType.BILINEAR))
+        sidebar.pack_start(brand_icon, False, False, 0)
         brand = Gtk.Label()
-        brand.set_markup("<big><b>HAOS AIO</b></big>\nUSB Creator")
-        brand.set_xalign(0)
-        sidebar.pack_start(brand, False, False, 8)
+        brand.set_markup("<b>HAOS AIO</b>")
+        sidebar.pack_start(brand, False, False, 0)
+        brand_sub = Gtk.Label(label="USB Creator")
+        brand_sub.get_style_context().add_class("ha-brand-sub")
+        sidebar.pack_start(brand_sub, False, False, 0)
         sidebar.pack_start(Gtk.Separator(), False, False, 8)
         self.nav_labels = []
         for _ in ("Welcome", "USB drive", "Review", "Writing"):
@@ -45,11 +72,9 @@ class CreatorWindow(Gtk.Window):
         self.coffee_panel = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=7)
         self.coffee_panel.set_no_show_all(True)
         coffee = Gtk.Label(label="If this saved you some time")
+        coffee.get_style_context().add_class("ha-muted")
         self.coffee_panel.pack_start(coffee, False, False, 0)
-        image_path = Path(__file__).resolve().parent / "assets" / "bmc-button.png"
-        if not image_path.exists():
-            image_path = Path(__file__).resolve().parents[1] / "WindowsApp" / "src" / "HAOSInstaller.App" / "Assets" / "bmc-button.png"
-        pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(str(image_path), 128, 36, True)
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(str(assets / "bmc-button.png"), 128, 36, True)
         self.coffee_link = Gtk.LinkButton.new_with_label("https://buymeacoffee.com/xalies", "")
         self.coffee_link.set_image(Gtk.Image.new_from_pixbuf(pixbuf))
         self.coffee_link.set_always_show_image(True)
@@ -58,9 +83,12 @@ class CreatorWindow(Gtk.Window):
         coffee.show()
         self.coffee_link.show_all()
         sidebar.pack_end(self.coffee_panel, False, False, 4)
-        root.pack_start(Gtk.Separator(orientation=Gtk.Orientation.VERTICAL), False, False, 0)
         self.pages = Gtk.Stack()
         self.pages.set_transition_type(Gtk.StackTransitionType.SLIDE_LEFT_RIGHT)
+        self.pages.set_margin_start(32)
+        self.pages.set_margin_end(32)
+        self.pages.set_margin_top(30)
+        self.pages.set_margin_bottom(26)
         root.pack_start(self.pages, True, True, 0)
 
         welcome = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=16)
@@ -232,6 +260,11 @@ class CreatorWindow(Gtk.Window):
         for index, label in enumerate(self.nav_labels):
             title = ("Welcome", "USB drive", "Review", "Writing")[index]
             label.set_markup(f"<b>{index + 1}. {title}</b>" if index == active else f"{index + 1}. {title}")
+            context = label.get_style_context()
+            if index == active:
+                context.add_class("ha-active")
+            else:
+                context.remove_class("ha-active")
 
     def _go_review(self, *_):
         index = self.drive.get_active()
