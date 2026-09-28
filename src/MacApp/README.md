@@ -6,7 +6,7 @@ Requires macOS 13 or newer on Apple silicon or Intel.
 
 ## Run
 
-Download `HAOS-USB-Creator-macos.dmg` from the release page, open it and double-click `HAOS USB Creator.app`. The app runs directly from the compressed, read-only disk image and does not need to be copied to Applications. An ad-hoc signed development build may require Control-click → **Open** or approval under **System Settings → Privacy & Security**; a notarized release opens normally.
+Download `HAOS-USB-Creator-macos-universal.dmg` from the release page, open it and double-click `HAOS USB Creator.app`. The app runs directly from the compressed, read-only disk image and does not need to be copied to Applications. An ad-hoc signed development build may require Control-click → **Open** or approval under **System Settings → Privacy & Security**; a notarized release opens normally.
 
 The app runs without administrator rights. Only opening the USB drive for the raw write asks for an administrator password (the standard macOS prompt, through Apple's `authopen`). If macOS asks whether the app may access files on a removable volume, allow it; that is needed to write the USB drive and to copy Home Assistant OS onto the new `HAOS-CACHE` partition.
 
@@ -26,9 +26,9 @@ Only the Xcode Command Line Tools are needed (`xcode-select --install`).
 # or copy it out of the latest Windows release:
 src/MacApp/fetch-boot-image.sh
 
-# Builds artifacts/macos-app/HAOS USB Creator.app and HAOS-USB-Creator-macos.dmg
+# Builds artifacts/macos-app/HAOS USB Creator.app and HAOS-USB-Creator-macos-universal.dmg
 src/MacApp/build-app.sh
-open artifacts/macos-app/HAOS-USB-Creator-macos.dmg
+open artifacts/macos-app/HAOS-USB-Creator-macos-universal.dmg
 ```
 
 `build-app.sh [boot-image-dir] [output-dir]` bundles `haos-installer-x86_64.img` and its `.sha256` from the boot image directory (default `artifacts/installer-linux`). Without a bundled image the app also looks in `~/Library/Application Support/HAOS-USB-Creator/BootImages`.
@@ -51,7 +51,7 @@ To package an app exported from Xcode without rebuilding it, use the same enviro
 
 ```sh
 src/MacApp/create-dmg.sh "/path/to/HAOS USB Creator.app" \
-  artifacts/macos-app/HAOS-USB-Creator-macos.dmg
+  artifacts/macos-app/HAOS-USB-Creator-macos-universal.dmg
 ```
 
 GitHub release builds use the same signing and notarization credentials as the MeshVault workflow. Add these repository or organization Actions secrets before running a release:

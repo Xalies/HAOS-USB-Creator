@@ -6,7 +6,7 @@ set -euo pipefail
 script_dir="$(cd "$(dirname "$0")" && pwd)"
 repo_dir="$(cd "$script_dir/../.." && pwd)"
 app="${1:-$repo_dir/artifacts/macos-app/HAOS USB Creator.app}"
-dmg="${2:-$repo_dir/artifacts/macos-app/HAOS-USB-Creator-macos.dmg}"
+dmg="${2:-$repo_dir/artifacts/macos-app/HAOS-USB-Creator-macos-universal.dmg}"
 sign_identity="${CODE_SIGN_IDENTITY:--}"
 
 [[ -d "$app" ]] || { echo "App not found: $app" >&2; exit 1; }

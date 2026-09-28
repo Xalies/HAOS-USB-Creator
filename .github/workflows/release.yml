@@ -177,7 +177,7 @@ jobs:
         run: |
           set -euo pipefail
           app="artifacts/macos-app/HAOS USB Creator.app"
-          dmg="artifacts/macos-app/HAOS-USB-Creator-macos.dmg"
+          dmg="artifacts/macos-app/HAOS-USB-Creator-macos-universal.dmg"
           codesign --verify --deep --strict --verbose=2 "${app}"
           codesign --verify --verbose=2 "${dmg}"
           hdiutil verify "${dmg}"
@@ -187,8 +187,8 @@ jobs:
       - name: Upload macOS app
         uses: actions/upload-artifact@v7
         with:
-          name: haos-usb-creator-macos
-          path: artifacts/macos-app/HAOS-USB-Creator-macos.dmg
+          name: haos-usb-creator-macos-universal
+          path: artifacts/macos-app/HAOS-USB-Creator-macos-universal.dmg
           if-no-files-found: error
 
       - name: Remove signing material
@@ -237,7 +237,7 @@ jobs:
       - name: Download macOS app
         uses: actions/download-artifact@v8
         with:
-          name: haos-usb-creator-macos
+          name: haos-usb-creator-macos-universal
           path: publish
 
       - name: Validate bundled boot image
@@ -290,5 +290,5 @@ jobs:
           files: |
             publish/HAOS-USB-Creator-win-x64.zip
             publish/HAOS-USB-Creator-linux-x86_64.AppImage
-            publish/HAOS-USB-Creator-macos.dmg
+            publish/HAOS-USB-Creator-macos-universal.dmg
             publish/HAOS-Installer-ISO.zip

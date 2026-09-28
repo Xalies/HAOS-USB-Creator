@@ -39,7 +39,7 @@ From the GitHub release page, download the package for your desktop:
 
 - `HAOS-USB-Creator-win-x64.zip`
 - `HAOS-USB-Creator-linux-x86_64.AppImage`
-- `HAOS-USB-Creator-macos.dmg`
+- `HAOS-USB-Creator-macos-universal.dmg`
 
 Optional:
 

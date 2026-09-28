@@ -98,5 +98,5 @@ codesign "${sign_options[@]}" "$app/Contents/MacOS/HAOSUSBWriter"
 codesign "${sign_options[@]}" "$app"
 
 CODE_SIGN_IDENTITY="$sign_identity" "$script_dir/create-dmg.sh" \
-  "$app" "$out_dir/HAOS-USB-Creator-macos.dmg"
+  "$app" "$out_dir/HAOS-USB-Creator-macos-universal.dmg"
 echo "Built: $app"
