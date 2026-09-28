@@ -24,6 +24,20 @@ jobs:
       - name: Test
         run: xvfb-run -a /usr/bin/python3 -m unittest discover -s src/LinuxApp/tests -v
 
+  macos-app:
+    name: macOS app
+    runs-on: macos-15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Build
+        run: swift build --package-path src/MacApp
+
+      - name: Test
+        run: swift test --package-path src/MacApp
+
   windows-app:
     name: Windows app
     runs-on: windows-latest

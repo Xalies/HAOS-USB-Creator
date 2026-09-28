@@ -39,3 +39,9 @@ Thumbs.db
 Desktop.ini
 __pycache__/
 src/LinuxApp/boot-image/
+src/MacApp/.build/
+src/MacApp/.swiftpm/
+src/MacApp/boot-image/
+xcuserdata/
+*.xcuserstate
+.DS_Store

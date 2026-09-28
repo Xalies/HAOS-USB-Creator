@@ -1,12 +1,12 @@
 # HAOS AIO USB Creator
 
-HAOS AIO USB Creator is an unofficial Windows and Linux tool for creating a bootable all-in-one installer USB for **Home Assistant OS on a dedicated generic x86-64 PC**.
+HAOS AIO USB Creator is an unofficial Windows, Linux and macOS tool for creating a bootable all-in-one installer USB for **Home Assistant OS on a dedicated generic x86-64 PC**.
 
 It is meant for dedicated x86-64 machines.
 
 ## What It Does
 
-The Windows and Linux desktop apps:
+The Windows, Linux and macOS desktop apps:
 
 - detects removable USB drives
 - helps you choose the USB drive to turn into an installer
@@ -39,6 +39,7 @@ From the GitHub release page, download the package for your desktop:
 
 - `HAOS-USB-Creator-win-x64.zip`
 - `HAOS-USB-Creator-linux-x86_64.AppImage`
+- `HAOS-USB-Creator-macos.dmg`
 
 Optional:
 
@@ -49,8 +50,8 @@ The ISO is useful for VMs, Ventoy drives, or optical boot media. Unlike the USB 
 
 ## Basic Use
 
-1. Download and extract the Windows package, or download the Linux AppImage.
-2. Run the app (`HAOSInstaller.App.exe` on Windows or the executable AppImage on Linux).
+1. Download and extract the Windows package, open the macOS DMG, or download the Linux AppImage.
+2. Run the app (`HAOSInstaller.App.exe` on Windows, the executable AppImage on Linux, or `HAOS USB Creator.app` on macOS).
 3. Allow administrator permission when prompted for the USB write.
 4. Insert the USB drive you want to turn into the installer.
 5. Select the USB drive in the app.
@@ -60,7 +61,7 @@ The ISO is useful for VMs, Ventoy drives, or optical boot media. Unlike the USB 
 9. Boot that PC from the USB.
 10. Follow the installer prompts.
 
-Linux requirements and source checkout instructions are in [src/LinuxApp/README.md](src/LinuxApp/README.md).
+Linux requirements and source checkout instructions are in [src/LinuxApp/README.md](src/LinuxApp/README.md). macOS notes and build instructions are in [src/MacApp/README.md](src/MacApp/README.md).
 
 After installation, Home Assistant should become available at:
 

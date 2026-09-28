@@ -87,10 +87,125 @@ jobs:
           path: artifacts/linux-app/HAOS-USB-Creator-linux-x86_64.AppImage
           if-no-files-found: error
 
+  macos-app:
+    name: Build macOS app
+    runs-on: macos-15
+    timeout-minutes: 120
+    needs: boot-image
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Test
+        run: swift test --package-path src/MacApp
+
+      - name: Check signing secrets
+        shell: bash
+        env:
+          CERTIFICATE_BASE64: ${{ secrets.MAC_DEVELOPER_ID_CERTIFICATE_BASE64 }}
+          CERTIFICATE_PASSWORD: ${{ secrets.MAC_DEVELOPER_ID_CERTIFICATE_PASSWORD }}
+          NOTARY_APPLE_ID: ${{ secrets.MAC_NOTARY_APPLE_ID }}
+          NOTARY_APP_PASSWORD: ${{ secrets.MAC_NOTARY_APP_PASSWORD }}
+        run: |
+          set -euo pipefail
+          for name in CERTIFICATE_BASE64 CERTIFICATE_PASSWORD NOTARY_APPLE_ID NOTARY_APP_PASSWORD; do
+            if [[ -z "${!name:-}" ]]; then
+              echo "Missing required GitHub Actions secret: ${name}"
+              exit 1
+            fi
+          done
+
+      - name: Install Developer ID certificate
+        id: signing
+        shell: bash
+        env:
+          CERTIFICATE_BASE64: ${{ secrets.MAC_DEVELOPER_ID_CERTIFICATE_BASE64 }}
+          CERTIFICATE_PASSWORD: ${{ secrets.MAC_DEVELOPER_ID_CERTIFICATE_PASSWORD }}
+        run: |
+          set -euo pipefail
+
+          certificate_path="${RUNNER_TEMP}/HAOS-Developer-ID.p12"
+          keychain_path="${RUNNER_TEMP}/HAOS-signing.keychain-db"
+          keychain_password="$(uuidgen)$(uuidgen)"
+
+          printf '%s' "${CERTIFICATE_BASE64}" | base64 --decode > "${certificate_path}"
+          security create-keychain -p "${keychain_password}" "${keychain_path}"
+          security set-keychain-settings -lut 21600 "${keychain_path}"
+          security unlock-keychain -p "${keychain_password}" "${keychain_path}"
+          security import "${certificate_path}" \
+            -P "${CERTIFICATE_PASSWORD}" \
+            -A \
+            -t cert \
+            -f pkcs12 \
+            -k "${keychain_path}"
+          security set-key-partition-list \
+            -S apple-tool:,apple:,codesign: \
+            -s \
+            -k "${keychain_password}" \
+            "${keychain_path}"
+          security list-keychains -d user -s "${keychain_path}"
+
+          identity="$(security find-identity -v -p codesigning "${keychain_path}" | sed -n 's/.*"\(Developer ID Application:.*\)"/\1/p' | head -n 1)"
+          if [[ -z "${identity}" ]]; then
+            echo "The imported certificate does not contain a Developer ID Application identity."
+            security find-identity -v -p codesigning "${keychain_path}"
+            exit 1
+          fi
+
+          echo "identity=${identity}" >> "${GITHUB_OUTPUT}"
+          echo "keychain_path=${keychain_path}" >> "${GITHUB_OUTPUT}"
+          echo "Installed signing identity: ${identity}"
+
+      - name: Download boot image
+        uses: actions/download-artifact@v8
+        with:
+          name: haos-usb-creator-boot-image
+          path: src/MacApp/boot-image
+
+      - name: Build app
+        env:
+          VERSION: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+          CODE_SIGN_IDENTITY: ${{ steps.signing.outputs.identity }}
+          APPLE_ID: ${{ secrets.MAC_NOTARY_APPLE_ID }}
+          APP_SPECIFIC_PASSWORD: ${{ secrets.MAC_NOTARY_APP_PASSWORD }}
+          TEAM_ID: P3DFA26DMG
+        run: bash src/MacApp/build-app.sh src/MacApp/boot-image artifacts/macos-app
+
+      - name: Verify signed and notarized DMG
+        shell: bash
+        run: |
+          set -euo pipefail
+          app="artifacts/macos-app/HAOS USB Creator.app"
+          dmg="artifacts/macos-app/HAOS-USB-Creator-macos.dmg"
+          codesign --verify --deep --strict --verbose=2 "${app}"
+          codesign --verify --verbose=2 "${dmg}"
+          hdiutil verify "${dmg}"
+          xcrun stapler validate "${dmg}"
+          spctl --assess --type open --context context:primary-signature --verbose=2 "${dmg}"
+
+      - name: Upload macOS app
+        uses: actions/upload-artifact@v7
+        with:
+          name: haos-usb-creator-macos
+          path: artifacts/macos-app/HAOS-USB-Creator-macos.dmg
+          if-no-files-found: error
+
+      - name: Remove signing material
+        if: always()
+        shell: bash
+        env:
+          KEYCHAIN_PATH: ${{ steps.signing.outputs.keychain_path }}
+        run: |
+          if [[ -n "${KEYCHAIN_PATH}" && -f "${KEYCHAIN_PATH}" ]]; then
+            security delete-keychain "${KEYCHAIN_PATH}" || true
+          fi
+          rm -f "${RUNNER_TEMP}/HAOS-Developer-ID.p12"
+
   windows-app:
     name: Publish Windows app
     runs-on: windows-latest
-    needs: [boot-image, linux-app]
+    needs: [boot-image, linux-app, macos-app]
 
     steps:
       - name: Checkout
@@ -117,6 +232,12 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           name: haos-usb-creator-linux-x86_64-appimage
+          path: publish
+
+      - name: Download macOS app
+        uses: actions/download-artifact@v8
+        with:
+          name: haos-usb-creator-macos
           path: publish
 
       - name: Validate bundled boot image
@@ -169,4 +290,5 @@ jobs:
           files: |
             publish/HAOS-USB-Creator-win-x64.zip
             publish/HAOS-USB-Creator-linux-x86_64.AppImage
+            publish/HAOS-USB-Creator-macos.dmg
             publish/HAOS-Installer-ISO.zip

@@ -1,0 +1,552 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		400000000000000000000001 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000001 /* ContentView.swift */; };
+		400000000000000000000002 /* CreatorModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000002 /* CreatorModel.swift */; };
+		400000000000000000000003 /* HAOSUSBCreatorApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000003 /* HAOSUSBCreatorApp.swift */; };
+		400000000000000000000004 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000004 /* Theme.swift */; };
+		400000000000000000000005 /* UiText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000005 /* UiText.swift */; };
+		400000000000000000000006 /* WriterRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000006 /* WriterRunner.swift */; };
+		400000000000000000000011 /* BootImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000011 /* BootImage.swift */; };
+		400000000000000000000012 /* Drives.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000012 /* Drives.swift */; };
+		400000000000000000000013 /* GPT.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000013 /* GPT.swift */; };
+		400000000000000000000014 /* PrivilegedWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000014 /* PrivilegedWriter.swift */; };
+		400000000000000000000015 /* RawDiskAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000015 /* RawDiskAccess.swift */; };
+		400000000000000000000016 /* Release.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000016 /* Release.swift */; };
+		400000000000000000000017 /* Support.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000017 /* Support.swift */; };
+		400000000000000000000018 /* WriterProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000018 /* WriterProtocol.swift */; };
+		400000000000000000000021 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000021 /* main.swift */; };
+		400000000000000000000031 /* libHAOSUSBCreatorCore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 300000000000000000000042 /* libHAOSUSBCreatorCore.a */; };
+		400000000000000000000032 /* libHAOSUSBCreatorCore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 300000000000000000000042 /* libHAOSUSBCreatorCore.a */; };
+		400000000000000000000033 /* HAOSUSBWriter in Embed Writer */ = {isa = PBXBuildFile; fileRef = 300000000000000000000043 /* HAOSUSBWriter */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		700000000000000000000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 100000000000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 600000000000000000000002;
+			remoteInfo = HAOSUSBCreatorCore;
+		};
+		700000000000000000000002 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 100000000000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 600000000000000000000003;
+			remoteInfo = HAOSUSBWriter;
+		};
+		700000000000000000000003 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 100000000000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 600000000000000000000002;
+			remoteInfo = HAOSUSBCreatorCore;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		500000000000000000000003 /* Embed Writer */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 6;
+			files = (
+				400000000000000000000033 /* HAOSUSBWriter in Embed Writer */,
+			);
+			name = "Embed Writer";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		300000000000000000000001 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		300000000000000000000002 /* CreatorModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatorModel.swift; sourceTree = "<group>"; };
+		300000000000000000000003 /* HAOSUSBCreatorApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HAOSUSBCreatorApp.swift; sourceTree = "<group>"; };
+		300000000000000000000004 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		300000000000000000000005 /* UiText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UiText.swift; sourceTree = "<group>"; };
+		300000000000000000000006 /* WriterRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WriterRunner.swift; sourceTree = "<group>"; };
+		300000000000000000000011 /* BootImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BootImage.swift; sourceTree = "<group>"; };
+		300000000000000000000012 /* Drives.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Drives.swift; sourceTree = "<group>"; };
+		300000000000000000000013 /* GPT.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPT.swift; sourceTree = "<group>"; };
+		300000000000000000000014 /* PrivilegedWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivilegedWriter.swift; sourceTree = "<group>"; };
+		300000000000000000000015 /* RawDiskAccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RawDiskAccess.swift; sourceTree = "<group>"; };
+		300000000000000000000016 /* Release.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Release.swift; sourceTree = "<group>"; };
+		300000000000000000000017 /* Support.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Support.swift; sourceTree = "<group>"; };
+		300000000000000000000018 /* WriterProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WriterProtocol.swift; sourceTree = "<group>"; };
+		300000000000000000000021 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		300000000000000000000031 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		300000000000000000000032 /* prepare-xcode-resources.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "prepare-xcode-resources.sh"; sourceTree = "<group>"; };
+		300000000000000000000041 /* HAOS USB Creator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "HAOS USB Creator.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		300000000000000000000042 /* libHAOSUSBCreatorCore.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libHAOSUSBCreatorCore.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		300000000000000000000043 /* HAOSUSBWriter */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = HAOSUSBWriter; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		500000000000000000000002 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				400000000000000000000031 /* libHAOSUSBCreatorCore.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		500000000000000000000012 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		500000000000000000000022 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				400000000000000000000032 /* libHAOSUSBCreatorCore.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		200000000000000000000001 = {
+			isa = PBXGroup;
+			children = (
+				200000000000000000000003 /* Sources/HAOSUSBCreator */,
+				200000000000000000000004 /* Sources/HAOSUSBCreatorCore */,
+				200000000000000000000005 /* Sources/HAOSUSBWriter */,
+				300000000000000000000031 /* Info.plist */,
+				300000000000000000000032 /* prepare-xcode-resources.sh */,
+				200000000000000000000002 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		200000000000000000000002 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				300000000000000000000041 /* HAOS USB Creator.app */,
+				300000000000000000000042 /* libHAOSUSBCreatorCore.a */,
+				300000000000000000000043 /* HAOSUSBWriter */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		200000000000000000000003 /* Sources/HAOSUSBCreator */ = {
+			isa = PBXGroup;
+			children = (
+				300000000000000000000001 /* ContentView.swift */,
+				300000000000000000000002 /* CreatorModel.swift */,
+				300000000000000000000003 /* HAOSUSBCreatorApp.swift */,
+				300000000000000000000004 /* Theme.swift */,
+				300000000000000000000005 /* UiText.swift */,
+				300000000000000000000006 /* WriterRunner.swift */,
+			);
+			path = Sources/HAOSUSBCreator;
+			sourceTree = "<group>";
+		};
+		200000000000000000000004 /* Sources/HAOSUSBCreatorCore */ = {
+			isa = PBXGroup;
+			children = (
+				300000000000000000000011 /* BootImage.swift */,
+				300000000000000000000012 /* Drives.swift */,
+				300000000000000000000013 /* GPT.swift */,
+				300000000000000000000014 /* PrivilegedWriter.swift */,
+				300000000000000000000015 /* RawDiskAccess.swift */,
+				300000000000000000000016 /* Release.swift */,
+				300000000000000000000017 /* Support.swift */,
+				300000000000000000000018 /* WriterProtocol.swift */,
+			);
+			path = Sources/HAOSUSBCreatorCore;
+			sourceTree = "<group>";
+		};
+		200000000000000000000005 /* Sources/HAOSUSBWriter */ = {
+			isa = PBXGroup;
+			children = (
+				300000000000000000000021 /* main.swift */,
+			);
+			path = Sources/HAOSUSBWriter;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		600000000000000000000001 /* HAOS USB Creator */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 900000000000000000000002 /* Build configuration list for PBXNativeTarget "HAOS USB Creator" */;
+			buildPhases = (
+				500000000000000000000001 /* Sources */,
+				500000000000000000000002 /* Frameworks */,
+				500000000000000000000003 /* Embed Writer */,
+				500000000000000000000004 /* Prepare Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				710000000000000000000001 /* PBXTargetDependency */,
+				710000000000000000000002 /* PBXTargetDependency */,
+			);
+			name = "HAOS USB Creator";
+			productName = HAOSUSBCreator;
+			productReference = 300000000000000000000041 /* HAOS USB Creator.app */;
+			productType = "com.apple.product-type.application";
+		};
+		600000000000000000000002 /* HAOSUSBCreatorCore */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 900000000000000000000003 /* Build configuration list for PBXNativeTarget "HAOSUSBCreatorCore" */;
+			buildPhases = (
+				500000000000000000000011 /* Sources */,
+				500000000000000000000012 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = HAOSUSBCreatorCore;
+			productName = HAOSUSBCreatorCore;
+			productReference = 300000000000000000000042 /* libHAOSUSBCreatorCore.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		600000000000000000000003 /* HAOSUSBWriter */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 900000000000000000000004 /* Build configuration list for PBXNativeTarget "HAOSUSBWriter" */;
+			buildPhases = (
+				500000000000000000000021 /* Sources */,
+				500000000000000000000022 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				710000000000000000000003 /* PBXTargetDependency */,
+			);
+			name = HAOSUSBWriter;
+			productName = HAOSUSBWriter;
+			productReference = 300000000000000000000043 /* HAOSUSBWriter */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		100000000000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2700;
+				LastUpgradeCheck = 2700;
+				TargetAttributes = {
+					600000000000000000000001 = {
+						CreatedOnToolsVersion = 27.0;
+						DevelopmentTeam = P3DFA26DMG;
+					};
+					600000000000000000000002 = {
+						CreatedOnToolsVersion = 27.0;
+					};
+					600000000000000000000003 = {
+						CreatedOnToolsVersion = 27.0;
+						DevelopmentTeam = P3DFA26DMG;
+					};
+				};
+			};
+			buildConfigurationList = 900000000000000000000001 /* Build configuration list for PBXProject "HAOSUSBCreator" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 200000000000000000000001;
+			productRefGroup = 200000000000000000000002 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				600000000000000000000001 /* HAOS USB Creator */,
+				600000000000000000000002 /* HAOSUSBCreatorCore */,
+				600000000000000000000003 /* HAOSUSBWriter */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		500000000000000000000004 /* Prepare Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Prepare Resources";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "\"$SRCROOT/prepare-xcode-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		500000000000000000000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				400000000000000000000001 /* ContentView.swift in Sources */,
+				400000000000000000000002 /* CreatorModel.swift in Sources */,
+				400000000000000000000003 /* HAOSUSBCreatorApp.swift in Sources */,
+				400000000000000000000004 /* Theme.swift in Sources */,
+				400000000000000000000005 /* UiText.swift in Sources */,
+				400000000000000000000006 /* WriterRunner.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		500000000000000000000011 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				400000000000000000000011 /* BootImage.swift in Sources */,
+				400000000000000000000012 /* Drives.swift in Sources */,
+				400000000000000000000013 /* GPT.swift in Sources */,
+				400000000000000000000014 /* PrivilegedWriter.swift in Sources */,
+				400000000000000000000015 /* RawDiskAccess.swift in Sources */,
+				400000000000000000000016 /* Release.swift in Sources */,
+				400000000000000000000017 /* Support.swift in Sources */,
+				400000000000000000000018 /* WriterProtocol.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		500000000000000000000021 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				400000000000000000000021 /* main.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		710000000000000000000001 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 600000000000000000000002 /* HAOSUSBCreatorCore */;
+			targetProxy = 700000000000000000000001 /* PBXContainerItemProxy */;
+		};
+		710000000000000000000002 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 600000000000000000000003 /* HAOSUSBWriter */;
+			targetProxy = 700000000000000000000002 /* PBXContainerItemProxy */;
+		};
+		710000000000000000000003 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 600000000000000000000002 /* HAOSUSBCreatorCore */;
+			targetProxy = 700000000000000000000003 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		800000000000000000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = (
+					arm64,
+					x86_64,
+				);
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		800000000000000000000002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = (
+					arm64,
+					x86_64,
+				);
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				ONLY_ACTIVE_ARCH = NO;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		800000000000000000000011 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 4;
+				DEVELOPMENT_TEAM = P3DFA26DMG;
+				ENABLE_APP_SANDBOX = NO;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				EXECUTABLE_NAME = HAOSUSBCreator;
+				GENERATE_INFOPLIST_FILE = NO;
+				HAOS_BOOT_IMAGE_DIR = "$(SRCROOT)/../../artifacts/installer-linux";
+				INFOPLIST_FILE = Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "HAOS USB Installer";
+				INSTALL_PATH = "$(LOCAL_APPS_DIR)";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.xalies.haosaio;
+				PRODUCT_NAME = "HAOS USB Creator";
+				SKIP_INSTALL = NO;
+				SUPPORTED_PLATFORMS = macosx;
+			};
+			name = Debug;
+		};
+		800000000000000000000012 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "Developer ID Application";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 4;
+				DEVELOPMENT_TEAM = P3DFA26DMG;
+				ENABLE_APP_SANDBOX = NO;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				EXECUTABLE_NAME = HAOSUSBCreator;
+				GENERATE_INFOPLIST_FILE = NO;
+				HAOS_BOOT_IMAGE_DIR = "$(SRCROOT)/../../artifacts/installer-linux";
+				INFOPLIST_FILE = Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "HAOS USB Installer";
+				INSTALL_PATH = "$(LOCAL_APPS_DIR)";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.xalies.haosaio;
+				PRODUCT_NAME = "HAOS USB Creator";
+				SKIP_INSTALL = NO;
+				SUPPORTED_PLATFORMS = macosx;
+			};
+			name = Release;
+		};
+		800000000000000000000021 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEFINES_MODULE = YES;
+				MACH_O_TYPE = staticlib;
+				PRODUCT_MODULE_NAME = HAOSUSBCreatorCore;
+				PRODUCT_NAME = HAOSUSBCreatorCore;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = macosx;
+			};
+			name = Debug;
+		};
+		800000000000000000000022 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEFINES_MODULE = YES;
+				MACH_O_TYPE = staticlib;
+				PRODUCT_MODULE_NAME = HAOSUSBCreatorCore;
+				PRODUCT_NAME = HAOSUSBCreatorCore;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = macosx;
+			};
+			name = Release;
+		};
+		800000000000000000000031 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = P3DFA26DMG;
+				ENABLE_HARDENED_RUNTIME = YES;
+				PRODUCT_NAME = HAOSUSBWriter;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = macosx;
+			};
+			name = Debug;
+		};
+		800000000000000000000032 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "Developer ID Application";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = P3DFA26DMG;
+				ENABLE_HARDENED_RUNTIME = YES;
+				PRODUCT_NAME = HAOSUSBWriter;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = macosx;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		900000000000000000000001 /* Build configuration list for PBXProject "HAOSUSBCreator" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				800000000000000000000001 /* Debug */,
+				800000000000000000000002 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		900000000000000000000002 /* Build configuration list for PBXNativeTarget "HAOS USB Creator" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				800000000000000000000011 /* Debug */,
+				800000000000000000000012 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		900000000000000000000003 /* Build configuration list for PBXNativeTarget "HAOSUSBCreatorCore" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				800000000000000000000021 /* Debug */,
+				800000000000000000000022 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		900000000000000000000004 /* Build configuration list for PBXNativeTarget "HAOSUSBWriter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				800000000000000000000031 /* Debug */,
+				800000000000000000000032 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 100000000000000000000001 /* Project object */;
+}
