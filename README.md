@@ -31,7 +31,6 @@ When you boot another PC from that USB, the installer:
 - Do not use this for dual boot.
 - Do not use this if you need to keep existing data.
 - Do not select a Windows disk unless you intend to erase it.
-- The target PC should use UEFI boot mode.
 - Secure Boot should be disabled.
 
 ## Download
