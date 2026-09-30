@@ -39,7 +39,24 @@ class CreatorWindow(Gtk.Window):
             .ha-sidebar .ha-brand-sub { color: #7090B0; }
             .ha-sidebar .ha-active { color: #41BDF5; }
             .ha-sidebar separator { background-color: #29445F; }
+            .ha-drive-list { background-color: transparent; }
+            .ha-drive-card { background-color: #FFFFFF; color: #1A1A2E;
+                             border: 1px solid #E0E0E6; border-radius: 8px;
+                             padding: 12px 16px; margin-bottom: 8px; }
+            .ha-drive-card:hover, .ha-drive-card:focus { border-color: #41BDF5; }
+            .ha-drive-card:selected { background-color: #F3FBFF; border-color: #41BDF5; }
+            .ha-drive-detail { color: #6B7280; }
+            .ha-card { background-color: #FFFFFF; border: 1px solid #E0E0E6;
+                       border-radius: 8px; }
+            .ha-card.ha-active { border-color: #41BDF5; }
+            .ha-card.ha-done { border-color: #22C55E; }
+            .ha-card.ha-failed { background-color: #FEF2F2; border-color: #EF4444; }
+            .ha-card .ha-status, .ha-card .ha-badge { color: #6B7280; }
+            .ha-card.ha-active .ha-badge { color: #41BDF5; }
+            .ha-card.ha-done .ha-badge { color: #22C55E; }
+            .ha-card.ha-failed .ha-badge { color: #EF4444; }
             progressbar progress { background-color: #41BDF5; }
+            .ha-card.ha-done progressbar progress { background-color: #22C55E; }
         """)
         Gtk.StyleContext.add_provider_for_screen(self.get_screen(), css, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
         root = Gtk.Box()
@@ -120,11 +137,17 @@ class CreatorWindow(Gtk.Window):
         row = Gtk.Box(spacing=8)
         drive_page.pack_start(row, False, False, 0)
         row.pack_start(Gtk.Label(label="USB drive"), False, False, 0)
-        self.drive = Gtk.ComboBoxText()
-        row.pack_start(self.drive, True, True, 0)
         refresh = Gtk.Button(label="Refresh")
         refresh.connect("clicked", self.refresh)
-        row.pack_start(refresh, False, False, 0)
+        row.pack_end(refresh, False, False, 0)
+        scroll = Gtk.ScrolledWindow()
+        scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+        scroll.set_size_request(-1, 155)
+        drive_page.pack_start(scroll, False, False, 0)
+        self.drive = Gtk.ListBox()
+        self.drive.set_selection_mode(Gtk.SelectionMode.SINGLE)
+        self.drive.get_style_context().add_class("ha-drive-list")
+        scroll.add(self.drive)
 
         row = Gtk.Box(spacing=8)
         drive_page.pack_start(row, False, False, 0)
@@ -196,20 +219,25 @@ class CreatorWindow(Gtk.Window):
         self.write_badges = []
         self.write_statuses = []
         self.write_bars = []
+        self.write_cards = []
         for title in ("1 - Prepare installer", "2 - Download Home Assistant OS",
                       "3 - Write boot image", "4 - Finalise USB"):
-            card = Gtk.Frame()
+            card = Gtk.EventBox()
+            card.get_style_context().add_class("ha-card")
+            self.write_cards.append(card)
             content = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
-            content.set_border_width(8)
+            content.set_border_width(14)
             row = Gtk.Box(spacing=8)
             name = Gtk.Label(label=title)
             name.set_xalign(0)
             row.pack_start(name, True, True, 0)
             badge = Gtk.Label(label="Waiting")
+            badge.get_style_context().add_class("ha-badge")
             row.pack_end(badge, False, False, 0)
             self.write_badges.append(badge)
             content.pack_start(row, False, False, 0)
             status = Gtk.Label(label="Waiting")
+            status.get_style_context().add_class("ha-status")
             status.set_xalign(0)
             status.set_line_wrap(True)
             self.write_statuses.append(status)
@@ -222,6 +250,8 @@ class CreatorWindow(Gtk.Window):
             card.add(content)
             writing.pack_start(card, False, False, 0)
         self.active_step = 0
+        for index in range(4):
+            self._card_state(index, "waiting")
         self.create = Gtk.Button(label="Try again")
         self.create.connect("clicked", self.start)
         self.create.set_no_show_all(True)
@@ -267,15 +297,15 @@ class CreatorWindow(Gtk.Window):
                 context.remove_class("ha-active")
 
     def _go_review(self, *_):
-        index = self.drive.get_active()
-        if index < 0:
+        selected = self.drive.get_selected_row()
+        if selected is None:
             self.drive_feedback.set_text("Select a USB drive first.")
             return
         if self.ssh.get_active() and len(self.password.get_text()) < 8:
             self.drive_feedback.set_text("The SSH password must have at least 8 characters.")
             return
         self.drive_feedback.set_text("")
-        disk = self.disks[index]
+        disk = self.disks[selected.get_index()]
         options = ["Unattended install" if self.unattended.get_active() else "Guided install",
                    "Legacy BIOS enabled" if self.legacy.get_active() else "UEFI boot",
                    "SSH enabled" if self.ssh.get_active() else "SSH disabled"]
@@ -292,6 +322,14 @@ class CreatorWindow(Gtk.Window):
     def status(self, stage, detail="", percent=None, step=None):
         GLib.idle_add(self._status, stage, detail, percent, step)
 
+    def _card_state(self, index, state):
+        card = self.write_cards[index]
+        context = card.get_style_context()
+        for name in ("waiting", "active", "done", "skipped", "failed"):
+            context.remove_class("ha-" + name)
+        context.add_class("ha-" + state)
+        card.set_opacity(0.5 if state == "waiting" else 1.0)
+
     def _status(self, stage, detail="", percent=None, step=None):
         if step is not None:
             for index, badge in enumerate(self.write_badges):
@@ -299,8 +337,10 @@ class CreatorWindow(Gtk.Window):
                     badge.set_text("Done")
                     self.write_bars[index].set_fraction(1)
                     self.write_bars[index].set_text("Complete")
+                    self._card_state(index, "done")
                 elif index == step:
                     badge.set_text("Working…")
+                    self._card_state(index, "active")
             self.active_step = step
         self.write_statuses[self.active_step].set_text(f"{stage}: {detail}" if detail else stage)
         bar = self.write_bars[self.active_step]
@@ -313,6 +353,7 @@ class CreatorWindow(Gtk.Window):
         self.write_statuses[1].set_text(f"Download unavailable: {error}. The target PC will need internet access.")
         self.write_bars[1].set_fraction(0)
         self.write_bars[1].set_text("Skipped")
+        self._card_state(1, "skipped")
 
     def _finish(self, success, detail):
         self.pulsing_step = None
@@ -321,6 +362,7 @@ class CreatorWindow(Gtk.Window):
             self.write_bars[self.active_step].set_fraction(1)
         self.write_bars[self.active_step].set_text("Complete" if success else "Failed")
         self.write_badges[self.active_step].set_text("Done" if success else "Failed")
+        self._card_state(self.active_step, "done" if success else "failed")
         if success:
             self.finish_summary.set_text(detail)
             self._show_page("finish")
@@ -347,14 +389,31 @@ class CreatorWindow(Gtk.Window):
             self._status("Synchronising USB", "This may take a moment…", step=3)
 
     def refresh(self, *_):
-        self.drive.remove_all()
+        for row in self.drive.get_children():
+            self.drive.remove(row)
         try:
             self.disks = usb_disks()
             for disk in self.disks:
                 size = disk["size"] / 1024**3
-                self.drive.append_text(f"{disk['path']} — {disk['model']} — {size:.1f} GiB")
+                row = Gtk.ListBoxRow()
+                row.get_style_context().add_class("ha-drive-card")
+                content = Gtk.Box(spacing=14)
+                content.pack_start(Gtk.Label(label="💾"), False, False, 0)
+                details = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
+                name = Gtk.Label(label=disk["model"])
+                name.set_xalign(0)
+                details.pack_start(name, False, False, 0)
+                caption = Gtk.Label(label=f"{size:.1f} GiB  ·  {disk['path']}")
+                caption.set_xalign(0)
+                caption.get_style_context().add_class("ha-drive-detail")
+                details.pack_start(caption, False, False, 0)
+                content.pack_start(details, True, True, 0)
+                content.pack_end(Gtk.Label(label="›"), False, False, 0)
+                row.add(content)
+                self.drive.add(row)
+                row.show_all()
             if self.disks:
-                self.drive.set_active(0)
+                self.drive.select_row(self.drive.get_row_at_index(0))
                 self.drive_feedback.set_text("")
             else:
                 self.drive_feedback.set_text("No eligible USB drives found. Connect one and click Refresh.")
@@ -371,12 +430,12 @@ class CreatorWindow(Gtk.Window):
         dialog.destroy()
 
     def start(self, *_):
-        index = self.drive.get_active()
-        if index < 0:
+        selected = self.drive.get_selected_row()
+        if selected is None:
             self._show_page("drive")
             self.drive_feedback.set_text("Select a USB drive first.")
             return
-        disk = self.disks[index]
+        disk = self.disks[selected.get_index()]
         if self.ssh.get_active() and len(self.password.get_text()) < 8:
             self._show_page("drive")
             self.drive_feedback.set_text("The SSH password must have at least 8 characters.")
@@ -399,6 +458,7 @@ class CreatorWindow(Gtk.Window):
             self.write_statuses[index].set_text("Waiting")
             self.write_bars[index].set_fraction(0)
             self.write_bars[index].set_text("Waiting")
+            self._card_state(index, "waiting")
         self._show_page("writing")
         self._status("Checking boot image", "Verifying the bundled installer…", step=0)
         threading.Thread(target=self.worker, args=(request,), daemon=True).start()

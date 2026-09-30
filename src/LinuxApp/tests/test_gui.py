@@ -9,6 +9,22 @@ from gui import CreatorWindow, Gtk
 
 @unittest.skipUnless(Gtk.init_check()[0], "GTK display unavailable")
 class ProgressTests(unittest.TestCase):
+    def test_drive_cards_select_the_disk_for_review(self):
+        disks = [
+            {"path": "/dev/sdb", "model": "First USB", "size": 8 * 1024**3, "id": "8:16", "mounts": []},
+            {"path": "/dev/sdc", "model": "Second USB", "size": 16 * 1024**3, "id": "8:32", "mounts": []},
+        ]
+        with patch("gui.usb_disks", return_value=disks):
+            window = CreatorWindow()
+        window.show_all()
+        self.assertEqual(0, window.drive.get_selected_row().get_index())
+        row = window.drive.get_row_at_index(1)
+        self.assertTrue(row.get_style_context().has_class("ha-drive-card"))
+        window.drive.select_row(row)
+        window._go_review()
+        self.assertEqual("review", window.pages.get_visible_child_name())
+        self.assertIn("/dev/sdc", window.review_summary.get_text())
+
     def test_progress_and_final_result(self):
         with patch("gui.usb_disks", return_value=[]):
             window = CreatorWindow()
@@ -20,8 +36,10 @@ class ProgressTests(unittest.TestCase):
         window._message("Downloading Home Assistant OS: 25% (3.2 MiB/s)")
         self.assertEqual(0.25, window.write_bars[1].get_fraction())
         self.assertIn("3.2 MiB/s", window.write_statuses[1].get_text())
+        self.assertTrue(window.write_cards[1].get_style_context().has_class("ha-active"))
         window._skip_download("network unavailable")
         self.assertIn("network unavailable", window.write_statuses[1].get_text())
+        self.assertTrue(window.write_cards[1].get_style_context().has_class("ha-skipped"))
         window._message("Writing boot image: 99% (12.0 MiB/s)")
         self.assertEqual(0.99, window.write_bars[2].get_fraction())
         window._message("Writing boot image: flushing data to USB")
@@ -29,6 +47,7 @@ class ProgressTests(unittest.TestCase):
         window._message("Writing boot image: 100% (11.5 MiB/s)")
         window._message("Finalising USB: This will take a moment…")
         self.assertEqual("Done", window.write_badges[2].get_text())
+        self.assertTrue(window.write_cards[2].get_style_context().has_class("ha-done"))
         self.assertEqual("Working…", window.write_badges[3].get_text())
         window._message("Adding Home Assistant OS: 25% (8.0 MiB/s)")
         self.assertEqual(0.25, window.write_bars[3].get_fraction())
@@ -44,5 +63,6 @@ class ProgressTests(unittest.TestCase):
         window._finish(False, "Write failed")
         self.assertEqual("Failed", window.write_badges[3].get_text())
         self.assertEqual("Write failed", window.write_statuses[3].get_text())
+        self.assertTrue(window.write_cards[3].get_style_context().has_class("ha-failed"))
         self.assertEqual("writing", window.pages.get_visible_child_name())
         self.assertFalse(window.coffee_panel.get_visible())
