@@ -5,7 +5,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Assets\BootImage\**\*">
+    <Content Include="Assets\BootImage\**\*" Exclude="Assets\BootImage\README.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Resource Include="Assets\bmc-button.png" />
@@ -19,7 +19,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <Platforms>AnyCPU;x64</Platforms>
-    <AssemblyName>HAOSAIOUsbCreator</AssemblyName>
+    <AssemblyName>HAOS-USB-Creator</AssemblyName>
     <Product>HAOS AIO USB Creator</Product>
     <Authors>Sonny Gilbert</Authors>
     <Company>Sonny Gilbert</Company>

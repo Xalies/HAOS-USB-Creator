@@ -51,7 +51,7 @@ The ISO is useful for VMs, Ventoy drives, or optical boot media. Unlike the USB 
 ## Basic Use
 
 1. Download and extract the Windows package, open the macOS DMG, or download the Linux AppImage.
-2. Run the app (`HAOSInstaller.App.exe` on Windows, the executable AppImage on Linux, or `HAOS USB Creator.app` on macOS).
+2. Run the app (`HAOS-USB-Creator.exe` at the top of the extracted Windows ZIP, the executable AppImage on Linux, or `HAOS USB Creator.app` on macOS).
 3. Allow administrator permission when prompted for the USB write.
 4. Insert the USB drive you want to turn into the installer.
 5. Select the USB drive in the app.

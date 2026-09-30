@@ -247,7 +247,7 @@ jobs:
         run: dotnet test .\src\WindowsApp\HAOSInstaller.slnx -c Release -p:Platform=x64
 
       - name: Publish
-        run: dotnet publish .\src\WindowsApp\src\HAOSInstaller.App\HAOSInstaller.App.csproj -c Release -r win-x64 --self-contained true -p:Platform=x64 -o .\publish\win-x64
+        run: dotnet publish .\src\WindowsApp\src\HAOSInstaller.App\HAOSInstaller.App.csproj -p:PublishProfile=WinX64SelfContained -p:DebugType=embedded -c Release -r win-x64 --self-contained true -p:Platform=x64 -o .\publish\win-x64
 
       - name: Package Windows app
         run: |
