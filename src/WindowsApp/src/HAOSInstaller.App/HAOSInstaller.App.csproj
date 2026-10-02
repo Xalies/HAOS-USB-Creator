@@ -7,6 +7,7 @@
   <ItemGroup>
     <Content Include="Assets\BootImage\**\*" Exclude="Assets\BootImage\README.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
     </Content>
     <Resource Include="Assets\bmc-button.png" />
     <Resource Include="Assets\InstallerIcon.png" />
