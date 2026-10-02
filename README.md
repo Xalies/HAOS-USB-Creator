@@ -45,7 +45,7 @@ Optional:
 
 - `HAOS-Installer-ISO.zip`
 
-The ISO is useful for VMs, Ventoy drives, or optical boot media. Unlike the USB created by either desktop app, the ISO does not contain a cached Home Assistant OS image, so it needs internet access during install. The ISO by itself cannot install HAOS for a legacy boot. (for now)
+The ISO is useful for VMs, Ventoy drives, or optical boot media. Unlike the USB created by either desktop app, the ISO does not contain a cached Home Assistant OS image, so it needs internet access during install. The ISO will show a prompt for installing with legacy boot support.
 
 
 ## Basic Use
