@@ -252,7 +252,8 @@ public partial class MainWindow : Window
                 }
 
                 await writeTask;
-                _usbDriveLetterHider.HideHaosVolumes(new Progress<ImageWriteProgress>(_ => { }));
+                var hideProgress = new Progress<ImageWriteProgress>(_ => { });
+                await Task.Run(() => _usbDriveLetterHider.HideHaosVolumes(hideProgress));
                 var stagedPayload = payloadTask is not null
                     ? await payloadTask
                     : await PreparePayloadAsync();
@@ -675,7 +676,9 @@ public partial class MainWindow : Window
         {
             try
             {
-                _usbDriveLetterHider.HideHaosVolumes(silentProgress);
+                // Volume queries can stall while the USB is being raw-written; keep them off the UI thread
+                // so write progress keeps updating.
+                await Task.Run(() => _usbDriveLetterHider.HideHaosVolumes(silentProgress), CancellationToken.None);
             }
             catch
             {
@@ -694,7 +697,7 @@ public partial class MainWindow : Window
 
         try
         {
-            _usbDriveLetterHider.HideHaosVolumes(silentProgress);
+            await Task.Run(() => _usbDriveLetterHider.HideHaosVolumes(silentProgress), CancellationToken.None);
         }
         catch
         {
