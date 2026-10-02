@@ -12,6 +12,7 @@ public sealed class SafeImageWriter(DiskWriteGuard guard) : IImageWriter
 {
     private const int BufferSize = 4 * 1024 * 1024;
     private const int RawWriteChunkSize = 1024 * 1024;
+    private const int DeferredHeaderSize = 1024 * 1024;
 
     public async Task WriteAsync(
         ImageWriteRequest request,
@@ -96,10 +97,21 @@ public sealed class SafeImageWriter(DiskWriteGuard guard) : IImageWriter
                 progress,
                 reportFailure: false);
 
+            // Hold back the start of the image (protective MBR and primary GPT) until the rest is on the USB.
+            // If Windows sees the new partition table mid-write it re-enumerates the disk and the raw handle
+            // can stop working with "A device which does not exist was specified".
+            var header = new byte[(int)Math.Min(DeferredHeaderSize, sourceInfo.Length)];
+            var headerRead = await source.ReadAtLeastAsync(header, header.Length, throwOnEndOfStream: false, cancellationToken);
+            if (headerRead != header.Length)
+            {
+                throw new IOException($"Could not read the start of {request.SourceImagePath}.");
+            }
+
             var buffer = new byte[BufferSize];
             long copied = 0;
             int read;
 
+            SeekTo(targetHandle, header.Length, request.Target.DevicePath);
             while ((read = await source.ReadAsync(buffer, cancellationToken)) > 0)
             {
                 WriteAll(targetHandle, buffer, read, request.Target.DevicePath, progress);
@@ -107,6 +119,17 @@ public sealed class SafeImageWriter(DiskWriteGuard guard) : IImageWriter
                 var percent = sourceInfo.Length == 0 ? 100 : copied * 100d / sourceInfo.Length;
                 progress.Report(new ImageWriteProgress($"Wrote {copied:N0} of {sourceInfo.Length:N0} bytes.", percent));
             }
+
+            if (!NativeMethods.FlushFileBuffers(targetHandle))
+            {
+                progress.Report(new ImageWriteProgress($"Could not flush {request.Target.DevicePath}: {new Win32Exception(Marshal.GetLastWin32Error()).Message}"));
+            }
+
+            progress.Report(new ImageWriteProgress("Writing partition table."));
+            SeekTo(targetHandle, 0, request.Target.DevicePath);
+            WriteAll(targetHandle, header, header.Length, request.Target.DevicePath, progress);
+            copied += header.Length;
+            progress.Report(new ImageWriteProgress($"Wrote {copied:N0} of {sourceInfo.Length:N0} bytes.", 100));
 
             if (!NativeMethods.FlushFileBuffers(targetHandle))
             {
@@ -369,6 +392,15 @@ public sealed class SafeImageWriter(DiskWriteGuard guard) : IImageWriter
         return false;
     }
 
+    private static void SeekTo(SafeFileHandle handle, long position, string devicePath)
+    {
+        if (!NativeMethods.SetFilePointerEx(handle, position, out _, NativeMethods.FileBegin))
+        {
+            var error = Marshal.GetLastWin32Error();
+            throw new IOException($"Could not seek {devicePath} to offset {position:N0}: {new Win32Exception(error).Message}", error);
+        }
+    }
+
     private static void WriteAll(
         SafeFileHandle handle,
         byte[] buffer,
@@ -447,6 +479,7 @@ public sealed class SafeImageWriter(DiskWriteGuard guard) : IImageWriter
         public const uint OpenExisting = 3;
         public const uint FileAttributeNormal = 0x00000080;
         public const uint FileFlagWriteThrough = 0x80000000;
+        public const uint FileBegin = 0;
         public const int ErrorAccessDenied = 5;
         public const int ErrorSharingViolation = 32;
 
@@ -485,6 +518,14 @@ public sealed class SafeImageWriter(DiskWriteGuard guard) : IImageWriter
             uint nNumberOfBytesToWrite,
             out uint lpNumberOfBytesWritten,
             IntPtr lpOverlapped);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool SetFilePointerEx(
+            SafeFileHandle hFile,
+            long liDistanceToMove,
+            out long lpNewFilePointer,
+            uint dwMoveMethod);
 
         [DllImport("kernel32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
