@@ -26,7 +26,6 @@ public partial class MainWindow : Window
     private readonly UsbDriveLetterHider _usbDriveLetterHider = new();
     private HaosReleaseInfo? _latestRelease;
     private HaosInstallerBootImage? _bootImage;
-    private HaosPayloadStageResult? _stagedPayload;
     private string? _sshPassword;
 
     public MainWindow()
@@ -73,7 +72,7 @@ public partial class MainWindow : Window
         await RefreshDrivesAsync();
     }
 
-    private async Task<HaosPayloadStageResult?> PreparePayloadAsync()
+    private async Task<(HaosCachedImage Download, HaosPayloadStageResult Staged)?> PreparePayloadAsync()
     {
         try
         {
@@ -90,19 +89,18 @@ public partial class MainWindow : Window
                 progress,
                 CancellationToken.None);
 
-            _stagedPayload = await _payloadStagingService.StageAsync(
+            var stagedPayload = await _payloadStagingService.StageAsync(
                 cachedImage,
                 GetUsbStagingDirectory(),
                 progress,
                 CancellationToken.None);
 
             ReportHaosDownloadProgress(new ImageWriteProgress(UiText.ProgressHaosReady, 100));
-            AppendLog($"Home Assistant OS image prepared: {_stagedPayload.CacheDirectory}");
-            return _stagedPayload;
+            AppendLog($"Home Assistant OS image prepared: {stagedPayload.CacheDirectory}");
+            return (cachedImage, stagedPayload);
         }
         catch (Exception ex)
         {
-            _stagedPayload = null;
             ReportHaosDownloadProgress(new ImageWriteProgress(string.Format(UiText.ProgressSkippedFormat, ex.Message), 0));
             AppendLog("Home Assistant OS image was not added to the USB. The booted installer will check if online.");
             return null;
@@ -245,7 +243,7 @@ public partial class MainWindow : Window
 
                 var writeTask = _imageWriter.WriteAsync(request, bootWriteProgress, CancellationToken.None);
                 var readyTask = await Task.WhenAny(writeTask, downloadStartSignal.Task);
-                Task<HaosPayloadStageResult?>? payloadTask = null;
+                Task<(HaosCachedImage Download, HaosPayloadStageResult Staged)?>? payloadTask = null;
                 if (readyTask == downloadStartSignal.Task)
                 {
                     payloadTask = PreparePayloadAsync();
@@ -254,18 +252,20 @@ public partial class MainWindow : Window
                 await writeTask;
                 var hideProgress = new Progress<ImageWriteProgress>(_ => { });
                 await Task.Run(() => _usbDriveLetterHider.HideHaosVolumes(hideProgress));
-                var stagedPayload = payloadTask is not null
+                var preparedPayload = payloadTask is not null
                     ? await payloadTask
                     : await PreparePayloadAsync();
 
-                if (stagedPayload is not null)
+                if (preparedPayload is { } payload)
                 {
                     await ProvisionUsbCacheWithRetryAsync(
-                        stagedPayload,
+                        payload.Staged,
                         unattendedInstall,
                         legacyBiosBoot,
                         _sshPassword,
                         CancellationToken.None);
+
+                    DeleteLocalPayloadFiles(payload.Download, payload.Staged);
                 }
                 else
                 {
@@ -279,7 +279,7 @@ public partial class MainWindow : Window
                     AppendLog("No Home Assistant OS image is available on the USB. The booted installer will check if online.");
                 }
 
-                ConfigureFinishText(unattendedInstall, legacyBiosBoot, stagedPayload is not null, _sshPassword);
+                ConfigureFinishText(unattendedInstall, legacyBiosBoot, preparedPayload is not null, _sshPassword);
                 GoToStep(InstallerStep.Finish);
             }
             finally
@@ -293,6 +293,21 @@ public partial class MainWindow : Window
             ShowWriteError(ex.Message);
             AppendLog($"Blocked: {ex.Message}");
         });
+    }
+
+    private void DeleteLocalPayloadFiles(HaosCachedImage download, HaosPayloadStageResult staged)
+    {
+        foreach (var path in new[] { download.ImagePath, download.ChecksumPath, staged.ImagePath, staged.ChecksumPath, staged.ManifestPath })
+        {
+            try
+            {
+                File.Delete(path);
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                AppendLog($"Could not remove a local Home Assistant OS file: {path}. {ex.Message}");
+            }
+        }
     }
 
     private async Task ProvisionUsbCacheWithRetryAsync(

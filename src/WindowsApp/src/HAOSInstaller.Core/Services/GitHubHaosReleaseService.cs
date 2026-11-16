@@ -8,11 +8,40 @@ namespace HAOSInstaller.Core.Services;
 
 public sealed partial class GitHubHaosReleaseService(HttpClient httpClient) : IHaosReleaseService
 {
-    private static readonly Uri LatestReleaseUri = new("https://api.github.com/repos/home-assistant/operating-system/releases/latest");
+    private const string ReleasesUrl = "https://api.github.com/repos/home-assistant/operating-system/releases";
 
     public async Task<HaosReleaseInfo> GetLatestGenericX86_64Async(CancellationToken cancellationToken)
     {
-        using var request = new HttpRequestMessage(HttpMethod.Get, LatestReleaseUri);
+        var latest = await GetAsync<GitHubReleaseDto>($"{ReleasesUrl}/latest", cancellationToken);
+        var image = FindImage(latest);
+        if (image is not null)
+        {
+            return image;
+        }
+
+        const int pageSize = 30;
+        for (var page = 1; ; page++)
+        {
+            var releases = await GetAsync<GitHubReleaseDto[]>($"{ReleasesUrl}?per_page={pageSize}&page={page}", cancellationToken);
+            foreach (var release in releases)
+            {
+                image = FindImage(release);
+                if (image is not null)
+                {
+                    return image;
+                }
+            }
+
+            if (releases.Length < pageSize)
+            {
+                throw new InvalidOperationException("No stable HAOS release included a generic x86-64 .img.xz asset.");
+            }
+        }
+    }
+
+    private async Task<T> GetAsync<T>(string url, CancellationToken cancellationToken) where T : class
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Get, url);
         request.Headers.UserAgent.Add(new ProductInfoHeaderValue("HAOSInstaller", "0.1"));
         request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.github+json"));
 
@@ -20,22 +49,24 @@ public sealed partial class GitHubHaosReleaseService(HttpClient httpClient) : IH
         response.EnsureSuccessStatusCode();
 
         await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
-        var release = await JsonSerializer.DeserializeAsync<GitHubReleaseDto>(
+        return await JsonSerializer.DeserializeAsync<T>(
             stream,
             JsonOptions,
-            cancellationToken);
+            cancellationToken) ?? throw new InvalidOperationException("GitHub returned an empty release response.");
+    }
 
-        if (release is null)
+    private static HaosReleaseInfo? FindImage(GitHubReleaseDto release)
+    {
+        if (release.Draft || release.Prerelease)
         {
-            throw new InvalidOperationException("GitHub returned an empty release response.");
+            return null;
         }
-
         var asset = release.Assets
             .FirstOrDefault(asset => GenericX86ImageRegex().IsMatch(asset.Name));
 
         if (asset is null)
         {
-            throw new InvalidOperationException("Latest HAOS release did not include a generic x86-64 .img.xz asset.");
+            return null;
         }
 
         var match = GenericX86ImageRegex().Match(asset.Name);
@@ -71,7 +102,9 @@ public sealed partial class GitHubHaosReleaseService(HttpClient httpClient) : IH
     private sealed record GitHubReleaseDto(
         [property: JsonPropertyName("tag_name")] string TagName,
         [property: JsonPropertyName("published_at")] DateTimeOffset PublishedAt,
-        [property: JsonPropertyName("assets")] GitHubAssetDto[] Assets);
+        [property: JsonPropertyName("assets")] GitHubAssetDto[] Assets,
+        [property: JsonPropertyName("draft")] bool Draft,
+        [property: JsonPropertyName("prerelease")] bool Prerelease);
 
     private sealed record GitHubAssetDto(
         [property: JsonPropertyName("name")] string Name,

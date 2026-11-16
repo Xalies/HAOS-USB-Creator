@@ -180,7 +180,7 @@ final class CreatorModel: ObservableObject {
             try JSONFiles.encode(request).write(to: requestFile, options: .atomic)
             FileManager.default.createFile(atPath: logFile.path, contents: nil)
 
-            var downloadTask: Task<Void, Never>?
+            var downloadTask: Task<URL?, Never>?
             var payloadCopied: Bool?
             var writerError: String?
             do {
@@ -206,9 +206,24 @@ final class CreatorModel: ObservableObject {
                 }
                 throw error
             }
-            downloadTask?.cancel()
             guard let copied = payloadCopied else {
+                downloadTask?.cancel()
                 throw CreatorError(writerError ?? UiText.errorWriteFailed)
+            }
+            if copied {
+                if let image = await downloadTask?.value {
+                    for file in [image, image.appendingPathExtension("sha256")] {
+                        do {
+                            try FileManager.default.removeItem(at: file)
+                        } catch let error as NSError where error.domain == NSCocoaErrorDomain && error.code == NSFileNoSuchFileError {
+                            continue
+                        } catch {
+                            NSLog("Could not remove local Home Assistant OS file %@: %@", file.path, error.localizedDescription)
+                        }
+                    }
+                }
+            } else {
+                downloadTask?.cancel()
             }
             configureFinishText(hasCachedPayload: copied, sshPassword: password)
             step = .finish
@@ -226,8 +241,9 @@ final class CreatorModel: ObservableObject {
     /// Downloads HAOS and tells the writer where it is. A failed download is not fatal:
     /// the booted installer downloads HAOS itself when it has internet access.
     @MainActor
-    private func preparePayload(in work: URL) async {
+    private func preparePayload(in work: URL) async -> URL? {
         var handoff = PayloadHandoff(payload: nil, release: nil)
+        var downloadedImage: URL?
         do {
             reportDownload(UiText.progressCheckingLatestHaos, 0)
             let release: HaosRelease
@@ -243,11 +259,13 @@ final class CreatorModel: ObservableObject {
             }
             reportDownload(UiText.progressHaosReady, 100)
             handoff = PayloadHandoff(payload: image.path, release: release)
+            downloadedImage = image
         } catch {
-            if Task.isCancelled { return }
+            if Task.isCancelled { return nil }
             reportDownload(String(format: UiText.progressSkippedFormat, error.localizedDescription), 0)
         }
         try? JSONFiles.encode(handoff).write(to: work.appendingPathComponent(PayloadHandoff.fileName), options: .atomic)
+        return downloadedImage
     }
 
     private var writerPath: String {

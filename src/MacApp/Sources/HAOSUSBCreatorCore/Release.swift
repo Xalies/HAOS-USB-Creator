@@ -18,7 +18,8 @@ public struct HaosRelease: Codable, Equatable {
 }
 
 public enum ReleaseService {
-    public static let latestURL = URL(string: "https://api.github.com/repos/home-assistant/operating-system/releases/latest")!
+    private static let releasesURL = "https://api.github.com/repos/home-assistant/operating-system/releases"
+    public static let latestURL = URL(string: releasesURL + "/latest")!
     public static let downloadPrefix = "https://github.com/home-assistant/operating-system/releases/download/"
     public static let userAgent = "HAOS-USB-Creator-macOS"
     private static let imageName = try! NSRegularExpression(pattern: "^haos_generic-x86-64-([A-Za-z0-9._-]+)\\.img\\.xz$")
@@ -42,6 +43,16 @@ public enum ReleaseService {
         guard let release = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
             throw CreatorError("GitHub returned an empty release response.")
         }
+        guard let image = try releaseImage(release) else {
+            throw CreatorError("The latest HAOS release has no verified generic x86-64 image.")
+        }
+        return image
+    }
+
+    private static func releaseImage(_ release: [String: Any]) throws -> HaosRelease? {
+        if release["draft"] as? Bool == true || release["prerelease"] as? Bool == true {
+            return nil
+        }
         for asset in release["assets"] as? [[String: Any]] ?? [] {
             guard let name = asset["name"] as? String,
                   let version = imageVersion(name),
@@ -58,18 +69,43 @@ public enum ReleaseService {
             return HaosRelease(version: version, filename: name, url: url,
                                sha256: String(digest.dropFirst(7)).lowercased(), size: size)
         }
-        throw CreatorError("The latest HAOS release has no verified generic x86-64 image.")
+        return nil
     }
 
     public static func latest() async throws -> HaosRelease {
-        var request = URLRequest(url: latestURL, timeoutInterval: 30)
+        let data = try await fetch(latestURL)
+        guard let release = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            throw CreatorError("GitHub returned an empty release response.")
+        }
+        if let image = try releaseImage(release) { return image }
+
+        let pageSize = 30
+        var page = 1
+        while true {
+            let url = URL(string: "\(releasesURL)?per_page=\(pageSize)&page=\(page)")!
+            let data = try await fetch(url)
+            guard let releases = try JSONSerialization.jsonObject(with: data) as? [[String: Any]] else {
+                throw CreatorError("GitHub returned an invalid release list.")
+            }
+            for release in releases {
+                if let image = try releaseImage(release) { return image }
+            }
+            guard releases.count == pageSize else {
+                throw CreatorError("No stable HAOS release has a verified generic x86-64 image.")
+            }
+            page += 1
+        }
+    }
+
+    private static func fetch(_ url: URL) async throws -> Data {
+        var request = URLRequest(url: url, timeoutInterval: 30)
         request.setValue(userAgent, forHTTPHeaderField: "User-Agent")
         request.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
         let (data, response) = try await URLSession.shared.data(for: request)
         if let http = response as? HTTPURLResponse, http.statusCode != 200 {
             throw CreatorError("GitHub returned HTTP \(http.statusCode).")
         }
-        return try parse(data)
+        return data
     }
 }
 

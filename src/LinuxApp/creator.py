@@ -15,7 +15,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 MAX_USB_BYTES = 128 * 1024**3
-RELEASE_API = "https://api.github.com/repos/home-assistant/operating-system/releases/latest"
+RELEASE_API = "https://api.github.com/repos/home-assistant/operating-system/releases"
 IMAGE_NAME = re.compile(r"^haos_generic-x86-64-([A-Za-z0-9._-]+)\.img\.xz$")
 SYSTEM_MOUNTS = {"/", "/boot", "/boot/efi", "/home", "/var", "[SWAP]"}
 
@@ -76,10 +76,15 @@ def verify_boot_image(path):
     return image
 
 
-def latest_release():
-    request = urllib.request.Request(RELEASE_API, headers={"User-Agent": "HAOS-USB-Creator-Linux"})
+def _fetch_releases(url):
+    request = urllib.request.Request(url, headers={"User-Agent": "HAOS-USB-Creator-Linux"})
     with urllib.request.urlopen(request, timeout=30) as response:
-        release = json.load(response)
+        return json.load(response)
+
+
+def _release_image(release):
+    if release.get("draft") or release.get("prerelease"):
+        return None
     for asset in release["assets"]:
         match = IMAGE_NAME.fullmatch(asset["name"])
         digest = asset.get("digest") or ""
@@ -89,7 +94,24 @@ def latest_release():
                 raise ValueError("Unexpected Home Assistant OS download URL.")
             return {"version": match.group(1), "filename": asset["name"],
                     "url": url, "sha256": digest[7:].lower(), "size": int(asset["size"])}
-    raise ValueError("The latest HAOS release has no verified generic x86-64 image.")
+
+
+def latest_release():
+    image = _release_image(_fetch_releases(f"{RELEASE_API}/latest"))
+    if image:
+        return image
+
+    page_size = 30
+    page = 1
+    while True:
+        releases = _fetch_releases(f"{RELEASE_API}?per_page={page_size}&page={page}")
+        for release in releases:
+            image = _release_image(release)
+            if image:
+                return image
+        if len(releases) < page_size:
+            raise ValueError("No stable HAOS release has a verified generic x86-64 image.")
+        page += 1
 
 
 def download_release(release, progress):

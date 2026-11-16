@@ -1,10 +1,39 @@
 import sys
+import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from gui import CreatorWindow, Gtk
+
+
+class DownloadCleanupTests(unittest.TestCase):
+    def test_removes_download_only_after_successful_usb_write(self):
+        for exit_code in (0, 1):
+            with self.subTest(exit_code=exit_code), tempfile.TemporaryDirectory() as directory:
+                payload = Path(directory) / "haos_generic-x86-64-test.img.xz"
+                payload.touch()
+                writer = Mock(stdout=iter(()))
+
+                def finish_write():
+                    self.assertTrue(payload.exists())
+                    return exit_code
+
+                writer.wait.side_effect = finish_write
+                window = Mock()
+                with (
+                    patch("gui.verify_boot_image"),
+                    patch("gui.latest_release", return_value={}),
+                    patch("gui.download_release", return_value=payload),
+                    patch("gui.os.geteuid", return_value=0),
+                    patch("gui.subprocess.Popen", return_value=writer),
+                    patch("gui.GLib.idle_add", side_effect=lambda callback, *args: callback(*args)),
+                ):
+                    CreatorWindow.worker(window, {"image": "installer.img", "disk": "/dev/test"})
+
+                self.assertEqual(payload.exists(), exit_code != 0)
+                self.assertEqual(window._finish.call_args.args[0], exit_code == 0)
 
 
 @unittest.skipUnless(Gtk.init_check()[0], "GTK display unavailable")

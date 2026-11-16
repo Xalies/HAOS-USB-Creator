@@ -1,7 +1,8 @@
 #!/bin/sh
 set -eu
 
-HAOS_RELEASE_API="${HAOS_RELEASE_API:-https://api.github.com/repos/home-assistant/operating-system/releases/latest}"
+HAOS_RELEASES_API="${HAOS_RELEASES_API:-https://api.github.com/repos/home-assistant/operating-system/releases}"
+HAOS_RELEASE_API="${HAOS_RELEASE_API:-$HAOS_RELEASES_API/latest}"
 HAOS_ONLINE_DIR="${HAOS_ONLINE_DIR:-/tmp/haos-online}"
 NETWORK_MODULES="
   af_packet
@@ -209,47 +210,61 @@ try_dhcp_once() {
   return 1
 }
 
+fetch_release_metadata() {
+  if ! curl --fail --location --silent --show-error \
+    --header "Accept: application/vnd.github+json" \
+    --header "User-Agent: HAOSInstallerLinux/0.1" \
+    "$1" -o "$2" 2>/tmp/haos-release-curl.err; then
+    log_warn "Failed to fetch HAOS release metadata: $(cat /tmp/haos-release-curl.err 2>/dev/null || true)"
+    return 1
+  fi
+}
+
+select_release_image() {
+  jq -r '
+    first(
+      (if type == "array" then .[] else . end)
+      | select(.draft != true and .prerelease != true)
+      | .assets[]
+      | select(.name | test("^haos_generic-x86-64-[A-Za-z0-9._-]+\\.img\\.xz$"))
+      | select(.digest // "" | test("^sha256:[a-fA-F0-9]{64}$"))
+      | {
+          version: (.name | capture("^haos_generic-x86-64-(?<version>.+)\\.img\\.xz$").version),
+          filename: .name,
+          url: .browser_download_url,
+          size: .size,
+          sha256: (.digest | sub("^sha256:"; "") | ascii_downcase)
+        }
+      | @sh "ONLINE_VERSION=\(.version) ONLINE_FILENAME=\(.filename) ONLINE_URL=\(.url) ONLINE_SIZE=\(.size) ONLINE_SHA256=\(.sha256)"
+    )
+  ' "$1"
+}
+
 fetch_latest_haos_release() {
   mkdir -p "$HAOS_ONLINE_DIR"
   release_json="$HAOS_ONLINE_DIR/latest-release.json"
   release_info="$HAOS_ONLINE_DIR/latest-release.env"
 
   log_info "Fetching latest HAOS release metadata."
-  if ! curl --fail --location --silent --show-error \
-    --header "Accept: application/vnd.github+json" \
-    --header "User-Agent: HAOSInstallerLinux/0.1" \
-    "$HAOS_RELEASE_API" \
-    -o "$release_json" 2>/tmp/haos-release-curl.err; then
-    log_warn "Failed to fetch HAOS release metadata: $(cat /tmp/haos-release-curl.err 2>/dev/null || true)"
-    return 1
-  fi
+  fetch_release_metadata "$HAOS_RELEASE_API" "$release_json" || return 1
+  select_release_image "$release_json" > "$release_info" || return 1
 
-  jq -r '
-    .assets[]
-    | select(.name | test("^haos_generic-x86-64-.+\\.img\\.xz$"))
-    | {
-        version: (.name | capture("^haos_generic-x86-64-(?<version>.+)\\.img\\.xz$").version),
-        filename: .name,
-        url: .browser_download_url,
-        size: .size,
-        sha256: ((.digest // "") | sub("^sha256:"; ""))
-      }
-    | @sh "ONLINE_VERSION=\(.version) ONLINE_FILENAME=\(.filename) ONLINE_URL=\(.url) ONLINE_SIZE=\(.size) ONLINE_SHA256=\(.sha256)"
-  ' "$release_json" > "$release_info"
-
-  if [ ! -s "$release_info" ]; then
-    log_error "Latest release did not include a generic x86-64 HAOS image."
-    return 1
-  fi
+  page_size=30
+  page=1
+  while [ ! -s "$release_info" ]; do
+    log_info "Searching stable HAOS releases for a generic x86-64 image (page $page)."
+    fetch_release_metadata "$HAOS_RELEASES_API?per_page=$page_size&page=$page" "$release_json" || return 1
+    select_release_image "$release_json" > "$release_info" || return 1
+    release_count="$(jq 'length' "$release_json")" || return 1
+    if [ ! -s "$release_info" ] && [ "$release_count" -lt "$page_size" ]; then
+      log_error "No stable HAOS release included a generic x86-64 image with a valid SHA-256 digest."
+      return 1
+    fi
+    page=$((page + 1))
+  done
 
   # shellcheck disable=SC1090
   . "$release_info"
-
-  if [ -z "${ONLINE_SHA256:-}" ] || [ "${#ONLINE_SHA256}" -ne 64 ]; then
-    log_error "Latest HAOS release metadata did not include a valid SHA-256 digest."
-    return 1
-  fi
-
   log_info "Latest HAOS generic x86-64 image: $ONLINE_FILENAME"
   printf '%s\n' "$release_info"
 }

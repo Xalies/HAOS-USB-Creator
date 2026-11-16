@@ -551,6 +551,11 @@ class CreatorWindow(Gtk.Window):
             detail = (f"{request['disk']} is ready. Safely remove it, then boot the target PC from it."
                       if request.get("payload") else
                       f"{request['disk']} is ready. The target PC will need internet access to install Home Assistant OS. Safely remove the USB drive.")
+            if request.get("payload"):
+                try:
+                    Path(request["payload"]).unlink(missing_ok=True)
+                except OSError as error:
+                    detail += f"\n\nCould not remove the local Home Assistant OS download: {error}"
             GLib.idle_add(self._finish, True, detail)
         except Exception as error:
             GLib.idle_add(self._finish, False, str(error))

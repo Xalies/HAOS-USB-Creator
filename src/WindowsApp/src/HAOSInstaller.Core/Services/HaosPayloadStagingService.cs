@@ -10,7 +10,7 @@ public sealed class HaosPayloadStagingService(ManifestWriter manifestWriter)
         IProgress<ImageWriteProgress> progress,
         CancellationToken cancellationToken)
     {
-        var cacheDirectory = Path.Combine(stagingDirectory, DateTimeOffset.UtcNow.ToString("yyyyMMddHHmmss"), "cache");
+        var cacheDirectory = Path.Combine(stagingDirectory, Guid.NewGuid().ToString("N"), "cache");
         Directory.CreateDirectory(cacheDirectory);
 
         var stagedImagePath = Path.Combine(cacheDirectory, cachedImage.Release.Filename);
