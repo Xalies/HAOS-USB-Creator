@@ -7,7 +7,7 @@ lsblk_json() {
     return 0
   fi
 
-  lsblk -J -o NAME,PATH,TYPE,SIZE,MODEL,SERIAL,WWN,TRAN,RM,ROTA,FSTYPE,LABEL,PARTLABEL,MOUNTPOINTS
+  lsblk -J -o NAME,PATH,TYPE,SIZE,MODEL,SERIAL,WWN,TRAN,SUBSYSTEMS,RM,ROTA,FSTYPE,LABEL,PARTLABEL,MOUNTPOINTS
 }
 
 detect_boot_usb() {
@@ -43,20 +43,29 @@ list_install_targets() {
       or (.label // "" | test("hassos|haos|home assistant|kernel|system|data|boot"; "i"));
     def haos_installer_usb:
       ([ .children[]? | select((.label // "") == "HAOSINSTLR" or (.label // "") == "HAOS-INSTLR" or (.label // "") == "HAOS-BOOT" or (.label // "") == "HAOS-CACHE") ] | length > 0);
+    # lsblk can leave TRAN blank for virtio-blk and virtio-scsi.
+    def disk_transport:
+      if (.subsystems // "" | split(":") | index("virtio")) != null then "virtio"
+      else (.tran // "unknown")
+      end;
 
     [
       .blockdevices[]
       | select(.type == "disk")
       | select(.path != $boot_usb)
       | select(haos_installer_usb | not)
-      | select((.tran // "") | test("nvme|sata|ata|mmc"; "i"))
+      | disk_transport as $transport
+      | select(
+          ($transport | test("nvme|sata|ata|mmc"; "i"))
+          or ($transport == "virtio" and (.rm != true) and (.tran != "usb"))
+        )
       | {
           path,
           model: (.model // "Unknown"),
           serial: (.serial // ""),
           wwn: (.wwn // ""),
           size,
-          tran: (.tran // "unknown"),
+          tran: $transport,
           removable: (.rm // false),
           hasWindowsPartitions: ([ .children[]? | select(windows_like) ] | length > 0),
           hasHaosLikePartitions: ([ .children[]? | select(haos_like) ] | length > 0),
